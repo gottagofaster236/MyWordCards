@@ -3,7 +3,7 @@ package com.lr_soft.mywordcards.data
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class WordPair(
-    val first: Word,
-    val second: Word
+data class Word(
+    val word: String,
+    val languageCode: Language
 )

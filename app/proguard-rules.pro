@@ -10,8 +10,7 @@
 
 # Application rules
 
-# Change here com.yourcompany.yourpackage
--keepclassmembers @kotlinx.serialization.Serializable class com.yourcompany.yourpackage.** {
+-keepclassmembers @kotlinx.serialization.Serializable class com.lr_soft.mywordcards.data.** {
     # lookup for plugin generated serializable classes
     *** Companion;
     # lookup for serializable objects
@@ -19,14 +18,8 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 # lookup for plugin generated serializable classes
--if @kotlinx.serialization.Serializable class com.yourcompany.yourpackage.**
+-if @kotlinx.serialization.Serializable class com.lr_soft.mywordcards.data.**
 -keepclassmembers class com.yourcompany.yourpackage.<1>$Companion {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
-# Serialization supports named companions but for such classes it is necessary to add an additional rule.
-# This rule keeps serializer and serializable class from obfuscation. Therefore, it is recommended not to use wildcards in it, but to write rules for each such class.
--keepattributes InnerClasses # Needed for `getDeclaredClasses`.
--keep class com.yourcompany.yourpackage.SerializableClassWithNamedCompanion$$serializer {
-    *** INSTANCE;
-}
