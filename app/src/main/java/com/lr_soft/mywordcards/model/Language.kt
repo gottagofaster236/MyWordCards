@@ -1,4 +1,4 @@
-package com.lr_soft.mywordcards.data
+package com.lr_soft.mywordcards.model
 
 import androidx.annotation.StringRes
 import com.lr_soft.mywordcards.R

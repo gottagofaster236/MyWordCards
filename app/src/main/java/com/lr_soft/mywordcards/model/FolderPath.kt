@@ -1,4 +1,4 @@
-package com.lr_soft.mywordcards.data
+package com.lr_soft.mywordcards.model
 
 data class FolderPath(
     val folders: List<Folder>

@@ -1,7 +1,7 @@
-package com.lr_soft.mywordcards.data
+package com.lr_soft.mywordcards.model
 
+import org.junit.Assert
 import org.junit.Test
-import org.junit.Assert.*
 
 internal class FolderPathTest {
 
@@ -14,7 +14,8 @@ internal class FolderPathTest {
     private val grandchildPath = FolderPath(listOf(root, child, grandchild))
 
     private val updatedChild = Folder(name = "2 new", listOf(), listOf(), null, setOf())
-    private val updatedRoot = Folder(name = "1", listOf(), listOf(updatedChild, anotherChild), null, setOf())
+    private val updatedRoot =
+        Folder(name = "1", listOf(), listOf(updatedChild, anotherChild), null, setOf())
     private val updatedChildPath = FolderPath(listOf(updatedRoot, updatedChild))
 
     @Test
@@ -28,15 +29,15 @@ internal class FolderPathTest {
     fun testGoUpOneFolder() {
         assertPathEquals(childPath, grandchildPath.goUpOneFolder())
         assertPathEquals(rootPath, childPath.goUpOneFolder())
-        assertThrows(IllegalStateException::class.java) { rootPath.goUpOneFolder() }
+        Assert.assertThrows(IllegalStateException::class.java) { rootPath.goUpOneFolder() }
     }
 
     @Test
     fun testGoTo() {
         assertPathEquals(childPath, rootPath.goToSubfolder(child))
         assertPathEquals(grandchildPath, childPath.goToSubfolder(grandchild))
-        assertThrows(IllegalStateException::class.java) { rootPath.goToSubfolder(grandchild) }
-        assertThrows(IllegalStateException::class.java) { rootPath.goToSubfolder(root) }
+        Assert.assertThrows(IllegalStateException::class.java) { rootPath.goToSubfolder(grandchild) }
+        Assert.assertThrows(IllegalStateException::class.java) { rootPath.goToSubfolder(root) }
     }
 
     @Test
@@ -45,12 +46,12 @@ internal class FolderPathTest {
     }
 
     private fun assertFolderEquals(expected: Folder, actual: Folder) {
-        assertEquals(expected, actual)
-        assertEquals(expected.subfolders, actual.subfolders)
+        Assert.assertEquals(expected, actual)
+        Assert.assertEquals(expected.subfolders, actual.subfolders)
     }
 
     private fun assertPathEquals(expected: FolderPath, actual: FolderPath) {
-        assertEquals(expected.folders.size, actual.folders.size)
+        Assert.assertEquals(expected.folders.size, actual.folders.size)
         for (i in expected.folders.indices) {
             assertFolderEquals(expected.folders[i], actual.folders[i])
         }
