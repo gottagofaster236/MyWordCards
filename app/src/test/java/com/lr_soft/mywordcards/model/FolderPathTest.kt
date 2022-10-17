@@ -5,17 +5,22 @@ import org.junit.Test
 
 internal class FolderPathTest {
 
-    private val grandchild = Folder(name = "3", listOf(), listOf(), null, setOf())
-    private val child = Folder(name = "2", listOf(), listOf(grandchild), null, setOf())
-    private val anotherChild = Folder(name = "2.1", listOf(), listOf(), null, setOf())
-    private val root = Folder(name = "1", listOf(), listOf(child, anotherChild), null, setOf())
+    private val grandchild =
+        Folder(name = "3", emptyList(), emptyList(), null, emptySet())
+    private val child =
+        Folder(name = "2", emptyList(), listOf(grandchild), null, emptySet())
+    private val anotherChild =
+        Folder(name = "2.1", emptyList(), emptyList(), null, emptySet())
+    private val root =
+        Folder(name = "1", emptyList(), listOf(child, anotherChild), null, emptySet())
     private val rootPath = FolderPath(listOf(root))
     private val childPath = FolderPath(listOf(root, child))
     private val grandchildPath = FolderPath(listOf(root, child, grandchild))
 
-    private val updatedChild = Folder(name = "2 new", listOf(), listOf(), null, setOf())
+    private val updatedChild =
+        Folder(name = "2 new", emptyList(), emptyList(), null, emptySet())
     private val updatedRoot =
-        Folder(name = "1", listOf(), listOf(updatedChild, anotherChild), null, setOf())
+        Folder(name = "1", emptyList(), listOf(updatedChild, anotherChild), null, emptySet())
     private val updatedChildPath = FolderPath(listOf(updatedRoot, updatedChild))
 
     @Test
