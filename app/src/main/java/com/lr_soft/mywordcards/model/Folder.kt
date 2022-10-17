@@ -1,5 +1,7 @@
 package com.lr_soft.mywordcards.model
 
+import android.content.Context
+import com.lr_soft.mywordcards.R
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,6 +12,7 @@ data class Folder(
     val lastGameResults: GameResults?,
     val incorrectlyGuessedWordPairs: Set<WordPair>
 ) {
+
     init {
         val childNames = subfolders.map(Folder::name)
         val areChildNamesUnique = childNames.size == childNames.distinct().size
@@ -29,5 +32,18 @@ data class Folder(
 
     override fun hashCode(): Int {
         return name.hashCode()
+    }
+
+    private companion object {
+        @JvmStatic
+        fun emptyRootFolder(context: Context) {
+            Folder(
+                name = context.getString(R.string.root_folder_name),
+                wordPairs = emptyList(),
+                subfolders = emptyList(),
+                lastGameResults = null,
+                incorrectlyGuessedWordPairs = emptySet()
+            )
+        }
     }
 }
