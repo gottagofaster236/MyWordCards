@@ -7,7 +7,7 @@ internal class FolderPathTest {
 
     private val grandchild = Folder(name = "3", listOf(), listOf(), null, setOf())
     private val child = Folder(name = "2", listOf(), listOf(grandchild), null, setOf())
-    private val anotherChild = Folder(name = "2", listOf(), listOf(), null, setOf())
+    private val anotherChild = Folder(name = "2.1", listOf(), listOf(), null, setOf())
     private val root = Folder(name = "1", listOf(), listOf(child, anotherChild), null, setOf())
     private val rootPath = FolderPath(listOf(root))
     private val childPath = FolderPath(listOf(root, child))
@@ -19,28 +19,40 @@ internal class FolderPathTest {
 
     @Test
     fun testGetCurrentFolder() {
-        assertEquals(grandchild, grandchildPath.currentFolder)
-        assertEquals(child, childPath.currentFolder)
-        assertEquals(root, rootPath.currentFolder)
+        assertFolderEquals(grandchild, grandchildPath.currentFolder)
+        assertFolderEquals(child, childPath.currentFolder)
+        assertFolderEquals(root, rootPath.currentFolder)
     }
 
     @Test
     fun testGoUpOneFolder() {
-        assertEquals(childPath, grandchildPath.goUpOneFolder())
-        assertEquals(rootPath, childPath.goUpOneFolder())
+        assertPathEquals(childPath, grandchildPath.goUpOneFolder())
+        assertPathEquals(rootPath, childPath.goUpOneFolder())
         assertThrows(IllegalStateException::class.java) { rootPath.goUpOneFolder() }
     }
 
     @Test
     fun testGoTo() {
-        assertEquals(childPath, rootPath.goTo(child))
-        assertEquals(grandchildPath, childPath.goTo(grandchild))
-        assertThrows(IllegalStateException::class.java) { rootPath.goTo(grandchild) }
-        assertThrows(IllegalStateException::class.java) { rootPath.goTo(root) }
+        assertPathEquals(childPath, rootPath.goToSubfolder(child))
+        assertPathEquals(grandchildPath, childPath.goToSubfolder(grandchild))
+        assertThrows(IllegalStateException::class.java) { rootPath.goToSubfolder(grandchild) }
+        assertThrows(IllegalStateException::class.java) { rootPath.goToSubfolder(root) }
     }
 
     @Test
     fun testUpdateCurrentFolder() {
-        assertEquals(updatedChildPath, childPath.updateCurrentFolder(updatedChild))
+        assertPathEquals(updatedChildPath, childPath.updateCurrentFolder(updatedChild))
+    }
+
+    private fun assertFolderEquals(expected: Folder, actual: Folder) {
+        assertEquals(expected, actual)
+        assertEquals(expected.subfolders, actual.subfolders)
+    }
+
+    private fun assertPathEquals(expected: FolderPath, actual: FolderPath) {
+        assertEquals(expected.folders.size, actual.folders.size)
+        for (i in expected.folders.indices) {
+            assertFolderEquals(expected.folders[i], actual.folders[i])
+        }
     }
 }

@@ -4,7 +4,7 @@ data class FolderPath(
     val folders: List<Folder>
 ) {
     init {
-        check(folders.isNotEmpty())
+        check(folders.isNotEmpty()) { "Can't go up from the root folder" }
     }
 
     val currentFolder: Folder
@@ -14,8 +14,10 @@ data class FolderPath(
         return FolderPath(folders.dropLast(1))
     }
 
-    fun goTo(folder: Folder): FolderPath {
-        check(folder in currentFolder.subfolders)
+    fun goToSubfolder(folder: Folder): FolderPath {
+        check(folder in currentFolder.subfolders) {
+            "Can only go to a subfolder"
+        }
         return FolderPath(folders.toMutableList().apply {
             add(folder)
         })
