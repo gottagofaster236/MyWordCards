@@ -53,6 +53,8 @@ android {
 dependencies {
     val composeUiVersion: String by rootProject.extra
     val hiltVersion: String by rootProject.extra
+    val mockitoVersion: String by rootProject.extra
+    val mockitoKotlinVersion: String by rootProject.extra
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
     implementation("androidx.activity:activity-compose:1.6.0")
@@ -63,6 +65,8 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.mockito:mockito-core:$mockitoVersion")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeUiVersion")

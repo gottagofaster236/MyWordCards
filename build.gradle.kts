@@ -3,6 +3,8 @@ buildscript {
     val composeUiVersion by extra { "1.1.1" }
     val kotlinVersion by extra { "1.6.10" }
     val hiltVersion by extra { "2.44" }
+    val mockitoVersion by extra { "4.8.0" }
+    val mockitoKotlinVersion by extra { "3.2.0" }
 }
 plugins {
     val kotlinVersion: String by extra

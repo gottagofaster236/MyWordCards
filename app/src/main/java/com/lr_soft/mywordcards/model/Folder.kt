@@ -10,13 +10,13 @@ data class Folder(
     val wordPairs: List<WordPair>,
     val subfolders: List<Folder>,
     val lastGameResults: GameResults?,
-    val incorrectlyGuessedWordPairs: Set<WordPair>
+    val incorrectlyGuessedWordPairs: List<WordPair>
 ) {
 
     init {
-        val childNames = subfolders.map(Folder::name)
-        val areChildNamesUnique = childNames.size == childNames.distinct().size
-        check(areChildNamesUnique)
+        checkUnique(wordPairs)
+        checkUnique(subfolders)
+        checkUnique(incorrectlyGuessedWordPairs)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -34,16 +34,21 @@ data class Folder(
         return name.hashCode()
     }
 
-    private companion object {
+    companion object {
         @JvmStatic
-        fun emptyRootFolder(context: Context) {
-            Folder(
+        fun emptyRootFolder(context: Context): Folder {
+            return Folder(
                 name = context.getString(R.string.root_folder_name),
                 wordPairs = emptyList(),
                 subfolders = emptyList(),
                 lastGameResults = null,
-                incorrectlyGuessedWordPairs = emptySet()
+                incorrectlyGuessedWordPairs = emptyList()
             )
+        }
+
+        @JvmStatic
+        private fun <T> checkUnique(list: List<T>) {
+            check(list.size == list.distinct().size)
         }
     }
 }
