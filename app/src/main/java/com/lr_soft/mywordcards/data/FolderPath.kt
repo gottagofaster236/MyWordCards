@@ -21,7 +21,7 @@ data class FolderPath(
         })
     }
 
-    fun updateCurrentFolder(newFolder: Folder) {
+    fun updateCurrentFolder(newFolder: Folder): FolderPath {
         val newFolders = folders.toMutableList()
         newFolders[newFolders.lastIndex] = newFolder
         for (i in newFolders.size - 2 downTo 0) {
@@ -32,5 +32,6 @@ data class FolderPath(
             }
             newFolders[i] = folders[i].copy(subfolders = newSubfolders)
         }
+        return FolderPath(newFolders)
     }
 }
