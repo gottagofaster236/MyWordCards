@@ -60,7 +60,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.6.0")
     implementation("androidx.compose.ui:ui:$composeUiVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation("androidx.compose.material:material:1.2.1")
+    implementation("androidx.compose.material3:material3:1.0.0-rc01")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
