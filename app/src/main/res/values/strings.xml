@@ -65,4 +65,6 @@
     <string name="lang_cy">Welsh</string>
     <string name="lang_id">Indonesian</string>
     <string name="lang_yi">Yiddish</string>
+    <string name="manage_subfolders">Manage subfolders</string>
+    <string name="add_words">Add words</string>
 </resources>

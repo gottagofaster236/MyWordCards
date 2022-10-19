@@ -31,6 +31,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
+        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -55,15 +56,22 @@ dependencies {
     val hiltVersion: String by rootProject.extra
     val mockitoVersion: String by rootProject.extra
     val mockitoKotlinVersion: String by rootProject.extra
+    val navVersion: String by rootProject.extra
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
     implementation("androidx.activity:activity-compose:1.6.0")
     implementation("androidx.compose.ui:ui:$composeUiVersion")
     implementation("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
+    implementation("androidx.compose.material:material-icons-extended:$composeUiVersion")
     implementation("androidx.compose.material3:material3:1.0.0-rc01")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     implementation("com.google.dagger:hilt-android:$hiltVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+    implementation("androidx.navigation:navigation-compose:$navVersion")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito:mockito-core:$mockitoVersion")
     testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")

@@ -1,5 +1,8 @@
 package com.lr_soft.mywordcards.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class FolderPath(
     val folders: List<Folder>
 ) {
@@ -9,6 +12,9 @@ data class FolderPath(
 
     val currentFolder: Folder
         get() = folders.last()
+
+    val rootFolder: Folder
+        get() = folders.first()
 
     fun goUpOneFolder(): FolderPath {
         return FolderPath(folders.dropLast(1))

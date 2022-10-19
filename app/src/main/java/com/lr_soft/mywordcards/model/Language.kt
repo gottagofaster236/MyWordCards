@@ -1,6 +1,7 @@
 package com.lr_soft.mywordcards.model
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Immutable
 import com.lr_soft.mywordcards.R
 import kotlinx.serialization.Serializable
 
@@ -8,6 +9,7 @@ import kotlinx.serialization.Serializable
  * Enum of languages supported by Google Translate.
  */
 @Serializable
+@Immutable
 enum class Language(
     @StringRes
     val nameResource: Int,

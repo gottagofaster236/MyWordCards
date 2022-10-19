@@ -2,6 +2,7 @@ package com.lr_soft.mywordcards.data
 
 import android.content.Context
 import com.lr_soft.mywordcards.model.Folder
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -17,6 +18,7 @@ private const val FILENAME = "root_folder.json"
 
 @Singleton
 class RootFolderRepository @Inject constructor(
+    @ApplicationContext
     private val context: Context
 ) {
 

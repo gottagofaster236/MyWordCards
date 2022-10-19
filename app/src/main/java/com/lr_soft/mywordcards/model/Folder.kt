@@ -1,10 +1,12 @@
 package com.lr_soft.mywordcards.model
 
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import com.lr_soft.mywordcards.R
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Immutable
 data class Folder(
     val name: String,
     val wordPairs: List<WordPair>,

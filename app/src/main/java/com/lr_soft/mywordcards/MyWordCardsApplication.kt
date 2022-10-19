@@ -1,4 +1,4 @@
-package com.lr_soft.mywordcards.ui
+package com.lr_soft.mywordcards
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

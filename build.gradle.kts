@@ -5,6 +5,7 @@ buildscript {
     val hiltVersion by extra { "2.44" }
     val mockitoVersion by extra { "4.8.0" }
     val mockitoKotlinVersion by extra { "3.2.0" }
+    val navVersion by extra { "2.5.2" }
 }
 plugins {
     val kotlinVersion: String by extra
