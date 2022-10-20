@@ -1,6 +1,8 @@
 package com.lr_soft.mywordcards.ui.folder
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -38,6 +40,7 @@ fun FolderRoute(
         editNewSubfolder = viewModel::editNewSubfolder,
         saveNewSubfolder = viewModel::saveNewSubfolder,
         cancelEdit = viewModel::cancelEdit,
+        goToSubfolder = viewModel::goToSubfolder,
         userMessageShown = viewModel::userMessageShown
     )
 }
@@ -50,6 +53,7 @@ private fun FolderScreen(
     editNewSubfolder: (String) -> Unit = {},
     saveNewSubfolder: () -> Unit = {},
     cancelEdit: () -> Unit = {},
+    goToSubfolder: (Folder) -> Unit = {},
     userMessageShown: () -> Unit = {},
 ) {
     val title = uiState.path?.currentFolder?.name ?: stringResource(R.string.app_name)
@@ -84,6 +88,7 @@ private fun FolderScreen(
             modifier = Modifier.padding(innerPaddingModifier),
             editNewSubfolder = editNewSubfolder,
             saveNewSubfolder = saveNewSubfolder,
+            goToSubfolder = goToSubfolder,
             cancelEdit = cancelEdit
         )
     }
@@ -106,6 +111,7 @@ private fun FolderScreenContent(
     editNewSubfolder: (String) -> Unit,
     saveNewSubfolder: () -> Unit,
     cancelEdit: () -> Unit,
+    goToSubfolder: (Folder) -> Unit,
     modifier: Modifier
 ) {
     val folders = uiState.path?.currentFolder?.subfolders
@@ -118,6 +124,7 @@ private fun FolderScreenContent(
             items(folders) { folder ->
                 FolderItem(
                     folder = folder,
+                    goToSubfolder = { goToSubfolder(folder) },
                     modifier = Modifier.padding(5.dp)
                 )
             }
@@ -149,10 +156,11 @@ private fun FolderScreenContent(
 @Composable
 private fun FolderItem(
     folder: Folder,
+    goToSubfolder: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
+        modifier = modifier.clickable(onClick = goToSubfolder)
     ) {
         Row(
             modifier = Modifier.padding(10.dp),
@@ -278,11 +286,15 @@ private val rootFolderPreview = Folder(
 @Composable
 private fun FolderItemPreview() {
     MyWordCardsTheme {
-        FolderItem(folder = folderPreview)
+        FolderItem(
+            folder = folderPreview,
+            goToSubfolder = {}
+        )
     }
 }
 
-@Preview
+@Preview("Light")
+@Preview("Dark", uiMode = UI_MODE_NIGHT_YES)
 @Composable
 private fun FolderPreview() {
     MyWordCardsTheme {

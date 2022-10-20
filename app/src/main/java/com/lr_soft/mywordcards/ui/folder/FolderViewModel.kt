@@ -58,6 +58,11 @@ class FolderViewModel @Inject constructor(
         )
     }
 
+    fun goToSubfolder(subfolder: Folder) {
+        val path = uiState.path ?: return
+        uiState = uiState.copy(path = path.goToSubfolder(subfolder))
+    }
+
     fun userMessageShown() {
         uiState = uiState.copy(userMessage = null)
     }
