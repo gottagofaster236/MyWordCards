@@ -23,6 +23,12 @@ class FolderViewModel @Inject constructor(
         loadRootFolder()
     }
 
+    fun onCreateSubfolder(currentName: String) {
+        uiState = uiState.copy(
+            ongoingFolderCreation = OngoingFolderCreation(currentName)
+        )
+    }
+
     private fun loadRootFolder() {
         viewModelScope.launch {
             val rootPath = FolderPath(listOf(rootFolderRepository.loadRootFolder()))

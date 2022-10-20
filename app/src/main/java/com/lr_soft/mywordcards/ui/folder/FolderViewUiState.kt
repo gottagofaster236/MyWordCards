@@ -16,5 +16,5 @@ data class OngoingFolderRename(
 )
 
 data class OngoingFolderCreation(
-    val newName: String
+    val newName: String = ""
 )

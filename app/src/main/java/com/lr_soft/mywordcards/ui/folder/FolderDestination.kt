@@ -24,12 +24,18 @@ import com.lr_soft.mywordcards.ui.theme.MyWordCardsTheme
 fun FolderDestination(
     viewModel: FolderViewModel = hiltViewModel()
 ) {
-    FolderScreen(viewModel.uiState)
+    FolderScreen(
+        uiState = viewModel.uiState,
+        onCreateSubfolder = viewModel::onCreateSubfolder,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FolderScreen(uiState: FolderViewUiState) {
+private fun FolderScreen(
+    uiState: FolderViewUiState,
+    onCreateSubfolder: (String) -> Unit
+) {
     val title = uiState.currentPath?.currentFolder?.name ?: stringResource(R.string.app_name)
 
     Scaffold(
@@ -58,14 +64,17 @@ private fun FolderScreen(uiState: FolderViewUiState) {
     ) { innerPaddingModifier ->
         FolderScreenContent(
             uiState = uiState,
-            modifier = Modifier.padding(innerPaddingModifier)
+            modifier = Modifier.padding(innerPaddingModifier),
+            onCreateSubfolder = onCreateSubfolder
         )
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FolderScreenContent(
     uiState: FolderViewUiState,
+    onCreateSubfolder: (String) -> Unit,
     modifier: Modifier
 ) {
     val folders = uiState.currentPath?.currentFolder?.subfolders
@@ -82,8 +91,17 @@ private fun FolderScreenContent(
                 )
             }
         }
+        uiState.ongoingFolderCreation?.let {
+            TextField(
+                value = it.newName,
+                onValueChange = onCreateSubfolder,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
         FolderButtons(
             uiState = uiState,
+            onCreateSubfolder = onCreateSubfolder,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -145,20 +163,34 @@ private fun FolderGameResults(gameResults: GameResults?, modifier: Modifier) {
 @Composable
 private fun FolderButtons(
     uiState: FolderViewUiState,
+    onCreateSubfolder: (String) -> Unit,
     modifier: Modifier
 ) {
-    if (!uiState.isInEditMode) {
-        Button(
-            onClick = {},
-            modifier = modifier
-        ) {
-            Text(text = stringResource(R.string.manage_subfolders))
+    if (uiState.ongoingFolderCreation != null) {
+        Button(onClick = {}, modifier = modifier) {
+            Text(text = stringResource(R.string.add_subfolder))
         }
+        Button(onClick = {}, modifier = modifier) {
+            Text(text = stringResource(R.string.cancel))
+        }
+    } else {
         Button(
             onClick = {},
             modifier = modifier
         ) {
             Text(text = stringResource(R.string.add_words))
+        }
+        Button(
+            onClick = { onCreateSubfolder("") },
+            modifier = modifier
+        ) {
+            Text(text = stringResource(R.string.add_subfolder))
+        }
+        Button(
+            onClick = {},
+            modifier = modifier
+        ) {
+            Text(text = stringResource(R.string.edit_subfolders))
         }
     }
 }
@@ -198,8 +230,11 @@ private fun FolderItemPreview() {
 @Composable
 private fun FolderPreview() {
     MyWordCardsTheme {
-        FolderScreen(uiState = FolderViewUiState(
-            currentPath = FolderPath(listOf(rootFolderPreview))
-        ))
+        FolderScreen(
+            uiState = FolderViewUiState(
+                currentPath = FolderPath(listOf(rootFolderPreview)),
+            ),
+            onCreateSubfolder = {}
+        )
     }
 }
