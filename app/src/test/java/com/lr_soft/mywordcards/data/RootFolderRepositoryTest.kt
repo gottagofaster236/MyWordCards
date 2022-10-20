@@ -2,6 +2,8 @@ package com.lr_soft.mywordcards.data
 
 import android.content.Context
 import com.lr_soft.mywordcards.model.*
+import com.lr_soft.mywordcards.test_util.FolderTestUtil.englishFrenchWordPairs
+import com.lr_soft.mywordcards.test_util.FolderTestUtil.englishGermanWordPairs
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
@@ -23,16 +25,6 @@ internal class RootFolderRepositoryTest {
     }
 
     private lateinit var repository: RootFolderRepository
-
-    private val englishGermanWordPairs = listOf(
-        WordPair(Word("hello", Language.EN), Word("hallo", Language.DE)),
-        WordPair(Word("goodbye", Language.EN), Word("Auf Wiedersehen", Language.DE))
-    )
-
-    private val englishFrenchWordPairs = listOf(
-        WordPair(Word("hello", Language.EN), Word("bonjour", Language.FR)),
-        WordPair(Word("goodbye", Language.EN), Word("au revoir", Language.FR))
-    )
 
     private val child1 = Folder(
         name = "en to de",

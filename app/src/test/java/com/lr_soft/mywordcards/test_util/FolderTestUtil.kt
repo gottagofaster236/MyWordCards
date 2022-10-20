@@ -1,7 +1,6 @@
 package com.lr_soft.mywordcards.test_util
 
-import com.lr_soft.mywordcards.model.Folder
-import com.lr_soft.mywordcards.model.FolderPath
+import com.lr_soft.mywordcards.model.*
 import org.junit.Assert
 
 object FolderTestUtil {
@@ -22,6 +21,16 @@ object FolderTestUtil {
     val updatedRoot =
         Folder(name = "1", emptyList(), listOf(updatedChild, anotherChild), null, emptyList())
     val updatedChildPath = FolderPath(listOf(updatedRoot, updatedChild))
+    val updatedRootPath = FolderPath(listOf(updatedRoot))
+
+    val englishGermanWordPairs = listOf(
+        WordPair(Word("hello", Language.EN), Word("hallo", Language.DE)),
+        WordPair(Word("goodbye", Language.EN), Word("Auf Wiedersehen", Language.DE))
+    )
+    val englishFrenchWordPairs = listOf(
+        WordPair(Word("hello", Language.EN), Word("bonjour", Language.FR)),
+        WordPair(Word("goodbye", Language.EN), Word("au revoir", Language.FR))
+    )
 
     fun assertFolderEquals(expected: Folder, actual: Folder) {
         Assert.assertEquals(expected.name, actual.name)

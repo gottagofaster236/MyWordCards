@@ -1,18 +1,25 @@
 package com.lr_soft.mywordcards.ui.folder
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.*
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,24 +28,34 @@ import com.lr_soft.mywordcards.model.*
 import com.lr_soft.mywordcards.ui.theme.MyWordCardsTheme
 
 @Composable
-fun FolderDestination(
-    viewModel: FolderViewModel = hiltViewModel()
+fun FolderRoute(
+    viewModel: FolderViewModel = hiltViewModel(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ) {
     FolderScreen(
         uiState = viewModel.uiState,
-        onCreateSubfolder = viewModel::onCreateSubfolder,
+        snackbarHostState = snackbarHostState,
+        editNewSubfolder = viewModel::editNewSubfolder,
+        saveNewSubfolder = viewModel::saveNewSubfolder,
+        cancelEdit = viewModel::cancelEdit,
+        userMessageShown = viewModel::userMessageShown
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FolderScreen(
-    uiState: FolderViewUiState,
-    onCreateSubfolder: (String) -> Unit
+    uiState: FolderUiState,
+    snackbarHostState: SnackbarHostState,
+    editNewSubfolder: (String) -> Unit = {},
+    saveNewSubfolder: () -> Unit = {},
+    cancelEdit: () -> Unit = {},
+    userMessageShown: () -> Unit = {},
 ) {
-    val title = uiState.currentPath?.currentFolder?.name ?: stringResource(R.string.app_name)
+    val title = uiState.path?.currentFolder?.name ?: stringResource(R.string.app_name)
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -65,19 +82,33 @@ private fun FolderScreen(
         FolderScreenContent(
             uiState = uiState,
             modifier = Modifier.padding(innerPaddingModifier),
-            onCreateSubfolder = onCreateSubfolder
+            editNewSubfolder = editNewSubfolder,
+            saveNewSubfolder = saveNewSubfolder,
+            cancelEdit = cancelEdit
         )
+    }
+
+    ShowUserMessage(
+        userMessage = uiState.userMessage,
+        snackbarHostState = snackbarHostState,
+        userMessageShown = userMessageShown
+    )
+
+    BackHandler(uiState.isInEditMode) {
+        cancelEdit()
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FolderScreenContent(
-    uiState: FolderViewUiState,
-    onCreateSubfolder: (String) -> Unit,
+    uiState: FolderUiState,
+    editNewSubfolder: (String) -> Unit,
+    saveNewSubfolder: () -> Unit,
+    cancelEdit: () -> Unit,
     modifier: Modifier
 ) {
-    val folders = uiState.currentPath?.currentFolder?.subfolders
+    val folders = uiState.path?.currentFolder?.subfolders
         ?: emptyList()
     Column(
         modifier = modifier.padding(5.dp),
@@ -91,17 +122,25 @@ private fun FolderScreenContent(
                 )
             }
         }
-        uiState.ongoingFolderCreation?.let {
+        uiState.newSubfolder?.let {
+            val focusManager = LocalFocusManager.current
             TextField(
-                value = it.newName,
-                onValueChange = onCreateSubfolder,
+                value = it.name,
+                onValueChange = editNewSubfolder,
+                label = { Text(stringResource(R.string.new_subfolder_name)) },
                 singleLine = true,
-                modifier = Modifier.fillMaxWidth()
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(5.dp)
             )
         }
         FolderButtons(
             uiState = uiState,
-            onCreateSubfolder = onCreateSubfolder,
+            editNewSubfolder = editNewSubfolder,
+            saveNewSubfolder = saveNewSubfolder,
+            cancelEdit = cancelEdit,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -162,15 +201,17 @@ private fun FolderGameResults(gameResults: GameResults?, modifier: Modifier) {
 
 @Composable
 private fun FolderButtons(
-    uiState: FolderViewUiState,
-    onCreateSubfolder: (String) -> Unit,
+    uiState: FolderUiState,
+    editNewSubfolder: (String) -> Unit,
+    saveNewSubfolder: () -> Unit,
+    cancelEdit: () -> Unit,
     modifier: Modifier
 ) {
-    if (uiState.ongoingFolderCreation != null) {
-        Button(onClick = {}, modifier = modifier) {
-            Text(text = stringResource(R.string.add_subfolder))
+    if (uiState.newSubfolder != null) {
+        Button(onClick = saveNewSubfolder, modifier = modifier) {
+            Text(text = stringResource(R.string.save))
         }
-        Button(onClick = {}, modifier = modifier) {
+        Button(onClick = cancelEdit, modifier = modifier) {
             Text(text = stringResource(R.string.cancel))
         }
     } else {
@@ -181,7 +222,7 @@ private fun FolderButtons(
             Text(text = stringResource(R.string.add_words))
         }
         Button(
-            onClick = { onCreateSubfolder("") },
+            onClick = { editNewSubfolder("") },
             modifier = modifier
         ) {
             Text(text = stringResource(R.string.add_subfolder))
@@ -192,6 +233,21 @@ private fun FolderButtons(
         ) {
             Text(text = stringResource(R.string.edit_subfolders))
         }
+    }
+}
+
+@Composable
+private fun ShowUserMessage(
+    userMessage: String?,
+    snackbarHostState: SnackbarHostState,
+    userMessageShown: () -> Unit
+) {
+    if (userMessage == null) {
+        return
+    }
+    LaunchedEffect(userMessage) {
+        snackbarHostState.showSnackbar(userMessage)
+        userMessageShown()
     }
 }
 
@@ -231,10 +287,10 @@ private fun FolderItemPreview() {
 private fun FolderPreview() {
     MyWordCardsTheme {
         FolderScreen(
-            uiState = FolderViewUiState(
-                currentPath = FolderPath(listOf(rootFolderPreview)),
+            uiState = FolderUiState(
+                path = FolderPath(listOf(rootFolderPreview)),
             ),
-            onCreateSubfolder = {}
+            snackbarHostState = SnackbarHostState()
         )
     }
 }

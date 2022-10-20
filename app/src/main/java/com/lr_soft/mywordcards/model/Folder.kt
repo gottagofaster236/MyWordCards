@@ -9,16 +9,22 @@ import kotlinx.serialization.Serializable
 @Immutable
 data class Folder(
     val name: String,
-    val wordPairs: List<WordPair>,
-    val subfolders: List<Folder>,
-    val lastGameResults: GameResults?,
-    val incorrectlyGuessedWordPairs: List<WordPair>
+    val wordPairs: List<WordPair> = emptyList(),
+    val subfolders: List<Folder> = emptyList(),
+    val lastGameResults: GameResults? = null,
+    val incorrectlyGuessedWordPairs: List<WordPair> = emptyList()
 ) {
 
     init {
-        checkUnique(wordPairs)
-        checkUnique(subfolders)
-        checkUnique(incorrectlyGuessedWordPairs)
+        if (name.isBlank()) {
+            throw InvalidFolderNameException()
+        }
+        if (hasDuplicates(wordPairs) || hasDuplicates(incorrectlyGuessedWordPairs)) {
+            throw DuplicateWordPairsException()
+        }
+        if (hasDuplicates(subfolders)) {
+            throw DuplicateSubfoldersException()
+        }
     }
 
     override fun equals(other: Any?): Boolean {
@@ -39,18 +45,16 @@ data class Folder(
     companion object {
         @JvmStatic
         fun emptyRootFolder(context: Context): Folder {
-            return Folder(
-                name = context.getString(R.string.root_folder_name),
-                wordPairs = emptyList(),
-                subfolders = emptyList(),
-                lastGameResults = null,
-                incorrectlyGuessedWordPairs = emptyList()
-            )
+            return Folder(name = context.getString(R.string.root_folder_name))
         }
 
         @JvmStatic
-        private fun <T> checkUnique(list: List<T>) {
-            check(list.size == list.distinct().size)
+        private fun <T> hasDuplicates(list: List<T>): Boolean {
+            return list.size != list.distinct().size
         }
     }
 }
+
+class InvalidFolderNameException : IllegalArgumentException()
+class DuplicateWordPairsException : IllegalArgumentException()
+class DuplicateSubfoldersException : IllegalArgumentException()

@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.lr_soft.mywordcards.ui.folder.FolderDestination
+import com.lr_soft.mywordcards.ui.folder.FolderRoute
 
 @Composable
 fun MyWordCardsNavGraph(
@@ -20,7 +20,7 @@ fun MyWordCardsNavGraph(
         modifier = modifier
     ) {
         composable(MyWordCardsDestinations.FOLDER) {
-            FolderDestination()
+            FolderRoute()
         }
     }
 }

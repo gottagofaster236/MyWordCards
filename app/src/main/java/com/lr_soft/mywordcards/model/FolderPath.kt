@@ -42,4 +42,19 @@ data class FolderPath(
         }
         return FolderPath(newFolders)
     }
+
+    fun updateSubfolder(subfolder: Folder, newValue: Folder): FolderPath {
+        var result = goToSubfolder(subfolder)
+        result = result.updateCurrentFolder(newValue)
+        result = result.goUpOneFolder()
+        return result
+    }
+
+    fun createSubfolder(subfolder: Folder): FolderPath {
+        return updateCurrentFolder(
+            currentFolder.copy(
+                subfolders = currentFolder.subfolders + listOf(subfolder)
+            )
+        )
+    }
 }

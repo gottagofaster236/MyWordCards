@@ -10,10 +10,12 @@ import com.lr_soft.mywordcards.test_util.FolderTestUtil.root
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.rootPath
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.updatedChild
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.updatedChildPath
+import com.lr_soft.mywordcards.test_util.FolderTestUtil.updatedRootPath
 import org.junit.Assert
 import org.junit.Test
 
 internal class FolderPathTest {
+
     @Test
     fun testGetCurrentFolder() {
         assertFolderEquals(grandchild, grandchildPath.currentFolder)
@@ -39,5 +41,10 @@ internal class FolderPathTest {
     @Test
     fun testUpdateCurrentFolder() {
         assertPathEquals(updatedChildPath, childPath.updateCurrentFolder(updatedChild))
+    }
+
+    @Test
+    fun testUpdateSubfolder() {
+        assertPathEquals(updatedRootPath, rootPath.updateSubfolder(child, updatedChild))
     }
 }

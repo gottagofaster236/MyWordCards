@@ -68,5 +68,13 @@
     <string name="add_words">Add words</string>
     <string name="add_subfolder">Add subfolder</string>
     <string name="edit_subfolders">Edit subfolders</string>
+    <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="new_subfolder_name">New subfolder name</string>
+    <string name="could_not_load_root_folder">Could not load root folder!</string>
+    <string name="could_not_save_root_folder">Could not save root folder!</string>
+    <string name="invalid_folder_name">Invalid folder name</string>
+    <string name="duplicate_word_pairs">Duplicate word pairs</string>
+    <string name="duplicate_subfolders">Duplicate subfolders</string>
+    <string name="could_not_save_new_subfolder">Could not save new subfolder</string>
 </resources>
