@@ -12,6 +12,7 @@ import com.lr_soft.mywordcards.model.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,7 +41,7 @@ class FolderViewModel @Inject constructor(
         val subfolder = uiState.newSubfolder ?: return
         val newPath = try {
             path.createSubfolder(Folder(name = subfolder.name))
-        } catch (e: Exception) {
+        } catch (e: IllegalArgumentException) {
             val userMessage = folderExceptionToString(e)
                 ?: context.getString(R.string.could_not_save_new_subfolder)
             uiState = uiState.copy(userMessage = userMessage)
@@ -81,10 +82,12 @@ class FolderViewModel @Inject constructor(
             val rootFolder = try {
                 rootFolderRepository.loadRootFolder()
             } catch (e: Exception) {
-                uiState = uiState.copy(
-                    userMessage = context.getString(R.string.could_not_load_root_folder)
-                )
-                Folder.emptyRootFolder(context)
+                handleLoadSaveException(e) {
+                    uiState = uiState.copy(
+                        userMessage = context.getString(R.string.could_not_load_root_folder)
+                    )
+                    Folder.emptyRootFolder(context)
+                }
             }
 
             val rootPath = FolderPath(listOf(rootFolder))
@@ -97,11 +100,20 @@ class FolderViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 rootFolderRepository.saveRootFolder(rootFolder)
-            } catch (_: Exception) {
-                uiState = uiState.copy(
-                    userMessage = context.getString(R.string.could_not_save_root_folder)
-                )
+            } catch (e: Exception) {
+                handleLoadSaveException(e) {
+                    uiState = uiState.copy(
+                        userMessage = context.getString(R.string.could_not_save_root_folder)
+                    )
+                }
             }
+        }
+    }
+
+    private fun <T> handleLoadSaveException(e: Exception, onLoadSaveException: () -> T): T {
+        return when (e) {
+            is IOException, is IllegalArgumentException -> onLoadSaveException()
+            else -> throw e
         }
     }
 }
