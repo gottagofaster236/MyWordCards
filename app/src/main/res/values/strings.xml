@@ -77,4 +77,5 @@
     <string name="duplicate_word_pairs">Duplicate word pairs</string>
     <string name="duplicate_subfolders">Duplicate subfolders</string>
     <string name="could_not_save_new_subfolder">Could not save new subfolder</string>
+    <string name="go_up_one_folder">Go up one folder</string>
 </resources>

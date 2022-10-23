@@ -68,6 +68,11 @@ class FolderViewModel @Inject constructor(
         uiState = uiState.copy(userMessage = null)
     }
 
+    fun goUpOneFolder() {
+        val path = uiState.path ?: return
+        uiState = uiState.copy(path = path.goUpOneFolder())
+    }
+
     private fun folderExceptionToString(e: Exception): String? {
         return when (e) {
             is InvalidFolderNameException -> context.getString(R.string.invalid_folder_name)

@@ -16,6 +16,9 @@ data class FolderPath(
     val rootFolder: Folder
         get() = folders.first()
 
+    val canGoUpOneFolder: Boolean
+        get() = folders.size > 1
+
     fun goUpOneFolder(): FolderPath {
         return FolderPath(folders.dropLast(1))
     }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.*
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
@@ -41,7 +42,8 @@ fun FolderRoute(
         saveNewSubfolder = viewModel::saveNewSubfolder,
         cancelEdit = viewModel::cancelEdit,
         goToSubfolder = viewModel::goToSubfolder,
-        userMessageShown = viewModel::userMessageShown
+        userMessageShown = viewModel::userMessageShown,
+        goUpOneFolder = viewModel::goUpOneFolder,
     )
 }
 
@@ -55,6 +57,7 @@ private fun FolderScreen(
     cancelEdit: () -> Unit = {},
     goToSubfolder: (Folder) -> Unit = {},
     userMessageShown: () -> Unit = {},
+    goUpOneFolder: () -> Unit = {},
 ) {
     val title = uiState.path?.currentFolder?.name ?: stringResource(R.string.app_name)
 
@@ -70,13 +73,12 @@ private fun FolderScreen(
                     )
                 },
                 navigationIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Folder,
-                        contentDescription = null,
-                        modifier = Modifier.size(30.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                    NavigationIcon(
+                        uiState = uiState,
+                        goUpOneFolder = goUpOneFolder,
+                        modifier = Modifier.size(30.dp)
                     )
-                },
+                 },
                 colors = centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
@@ -101,6 +103,32 @@ private fun FolderScreen(
 
     BackHandler(uiState.isInEditMode) {
         cancelEdit()
+    }
+}
+
+@Composable
+private fun NavigationIcon(
+    uiState: FolderUiState,
+    goUpOneFolder: () -> Unit,
+    modifier: Modifier
+) {
+    val path = uiState.path
+    if (path != null && path.canGoUpOneFolder) {
+        IconButton(onClick = goUpOneFolder) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = stringResource(R.string.go_up_one_folder),
+                modifier = modifier,
+                tint = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    } else {
+        Icon(
+            imageVector = Icons.Filled.Folder,
+            contentDescription = null,
+            modifier = modifier,
+            tint = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }
 
