@@ -54,7 +54,7 @@ class FolderViewModel @Inject constructor(
 
     fun cancelEdit() {
         uiState = uiState.copy(
-            folderRename = null,
+            subfolderRename = null,
             newSubfolder = null,
         )
     }
