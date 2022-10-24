@@ -73,6 +73,10 @@ class FolderViewModel @Inject constructor(
         uiState = uiState.copy(path = path.goUpOneFolder())
     }
 
+    fun setDropdownMenuExpanded(expanded: Boolean) {
+        uiState = uiState.copy(dropdownMenuExpanded = expanded)
+    }
+
     private fun folderExceptionToString(e: Exception): String? {
         return when (e) {
             is InvalidFolderNameException -> context.getString(R.string.invalid_folder_name)

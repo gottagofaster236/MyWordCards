@@ -7,7 +7,8 @@ data class FolderUiState(
     val path: FolderPath? = null,
     val newSubfolder: NewSubfolder? = null,
     val folderRename: FolderRename? = null,
-    val userMessage: String? = null
+    val userMessage: String? = null,
+    val dropdownMenuExpanded: Boolean = false,
 ) {
     val isInEditMode: Boolean
         get() = newSubfolder != null || folderRename != null

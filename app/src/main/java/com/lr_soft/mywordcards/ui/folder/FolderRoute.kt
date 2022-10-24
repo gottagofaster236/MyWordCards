@@ -10,8 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.TopAppBarDefaults.centerAlignedTopAppBarColors
 import androidx.compose.runtime.Composable
@@ -20,10 +19,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lr_soft.mywordcards.R
@@ -44,6 +45,7 @@ fun FolderRoute(
         goToSubfolder = viewModel::goToSubfolder,
         userMessageShown = viewModel::userMessageShown,
         goUpOneFolder = viewModel::goUpOneFolder,
+        setDropdownMenuExpanded = viewModel::setDropdownMenuExpanded
     )
 }
 
@@ -56,32 +58,18 @@ private fun FolderScreen(
     saveNewSubfolder: () -> Unit = {},
     cancelEdit: () -> Unit = {},
     goToSubfolder: (Folder) -> Unit = {},
-    userMessageShown: () -> Unit = {},
     goUpOneFolder: () -> Unit = {},
+    userMessageShown: () -> Unit = {},
+    setDropdownMenuExpanded: (Boolean) -> Unit = {},
 ) {
-    val title = uiState.path?.currentFolder?.name ?: stringResource(R.string.app_name)
-
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                },
-                navigationIcon = {
-                    NavigationIcon(
-                        uiState = uiState,
-                        goUpOneFolder = goUpOneFolder,
-                        modifier = Modifier.size(30.dp)
-                    )
-                 },
-                colors = centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
+            FolderTopBar(
+                uiState = uiState,
+                editNewSubfolder = editNewSubfolder,
+                goUpOneFolder = goUpOneFolder,
+                setDropdownMenuExpanded = setDropdownMenuExpanded
             )
         }
     ) { innerPaddingModifier ->
@@ -106,33 +94,147 @@ private fun FolderScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FolderTopBar(
+    uiState: FolderUiState,
+    editNewSubfolder: (String) -> Unit = {},
+    goUpOneFolder: () -> Unit = {},
+    setDropdownMenuExpanded: (Boolean) -> Unit,
+) {
+    val title = uiState.path?.currentFolder?.name ?: stringResource(R.string.app_name)
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+        },
+        navigationIcon = {
+            NavigationIcon(
+                uiState = uiState,
+                goUpOneFolder = goUpOneFolder,
+            )
+        },
+        actions = {
+            NavigationActions(
+                uiState = uiState,
+                editNewSubfolder = editNewSubfolder,
+                setDropdownMenuExpanded = setDropdownMenuExpanded,
+            )
+          },
+        colors = centerAlignedTopAppBarColors(containerColor = MaterialTheme.colorScheme.primary)
+    )
+}
+
 @Composable
 private fun NavigationIcon(
     uiState: FolderUiState,
     goUpOneFolder: () -> Unit,
-    modifier: Modifier
 ) {
     val path = uiState.path
     if (path != null && path.canGoUpOneFolder) {
-        IconButton(onClick = goUpOneFolder) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = stringResource(R.string.go_up_one_folder),
-                modifier = modifier,
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-        }
+        TopBarIconButton(
+            imageVector = Icons.Filled.ArrowBack,
+            onClick = goUpOneFolder,
+            contentDescription = stringResource(R.string.go_up_one_folder),
+        )
     } else {
+        TopBarIconButton(Icons.Filled.Folder)
+    }
+}
+
+@Composable
+fun NavigationActions(
+    uiState: FolderUiState,
+    editNewSubfolder: (String) -> Unit,
+    setDropdownMenuExpanded: (Boolean) -> Unit,
+) {
+    TopBarIconButton(
+        imageVector = Icons.Default.MoreVert,
+        onClick = { setDropdownMenuExpanded(true) },
+        contentDescription = stringResource(R.string.more_options)
+    )
+    NavigationDropdownMenu(
+        expanded = uiState.dropdownMenuExpanded,
+        editNewSubfolder = editNewSubfolder,
+        dismissDropdownMenu = { setDropdownMenuExpanded(false) }
+    )
+}
+
+@Composable
+private fun TopBarIconButton(
+    imageVector: ImageVector,
+    onClick: () -> Unit = {},
+    contentDescription: String? = null,
+    size: Dp? = 30.dp,
+    tint: Color = MaterialTheme.colorScheme.onPrimary
+) {
+    val modifier = Modifier.run {
+        size?.let { size(it) } ?: this
+    }
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+    ) {
         Icon(
-            imageVector = Icons.Filled.Folder,
-            contentDescription = null,
+            imageVector = imageVector,
+            contentDescription = contentDescription,
             modifier = modifier,
-            tint = MaterialTheme.colorScheme.onPrimary
+            tint = tint
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NavigationDropdownMenu(
+    expanded: Boolean,
+    editNewSubfolder: (String) -> Unit,
+    dismissDropdownMenu: () -> Unit,
+) {
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = dismissDropdownMenu
+    ) {
+        NavigationDropdownMenuItem(
+            text = stringResource(R.string.add_words),
+            onClick = {},
+            leadingIcon = Icons.Filled.TextFields,
+            dismissDropdownMenu = dismissDropdownMenu
+        )
+        NavigationDropdownMenuItem(
+            text = stringResource(R.string.add_subfolder),
+            onClick = { editNewSubfolder("") },
+            leadingIcon = Icons.Filled.CreateNewFolder,
+            dismissDropdownMenu = dismissDropdownMenu
+        )
+        NavigationDropdownMenuItem(
+            text = stringResource(R.string.edit_subfolders),
+            onClick = {},
+            leadingIcon = Icons.Filled.Edit,
+            dismissDropdownMenu = dismissDropdownMenu
+        )
+    }
+}
+
+@Composable
+fun NavigationDropdownMenuItem(
+    text: String,
+    onClick: () -> Unit,
+    leadingIcon: ImageVector,
+    dismissDropdownMenu: () -> Unit
+) {
+    DropdownMenuItem(
+        text = { Text(text) },
+        onClick = {
+            dismissDropdownMenu()
+            onClick()
+        },
+        leadingIcon = { Icon(leadingIcon, null) }
+    )
+}
+
 @Composable
 private fun FolderScreenContent(
     uiState: FolderUiState,
@@ -157,21 +259,7 @@ private fun FolderScreenContent(
                 )
             }
         }
-        uiState.newSubfolder?.let {
-            val focusManager = LocalFocusManager.current
-            TextField(
-                value = it.name,
-                onValueChange = editNewSubfolder,
-                label = { Text(stringResource(R.string.new_subfolder_name)) },
-                singleLine = true,
-                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(5.dp)
-            )
-        }
-        FolderButtons(
+        FolderEditFieldAndButton(
             uiState = uiState,
             editNewSubfolder = editNewSubfolder,
             saveNewSubfolder = saveNewSubfolder,
@@ -236,7 +324,7 @@ private fun FolderGameResults(gameResults: GameResults?, modifier: Modifier) {
 }
 
 @Composable
-private fun FolderButtons(
+private fun FolderEditFieldAndButton(
     uiState: FolderUiState,
     editNewSubfolder: (String) -> Unit,
     saveNewSubfolder: () -> Unit,
@@ -244,30 +332,49 @@ private fun FolderButtons(
     modifier: Modifier
 ) {
     if (uiState.newSubfolder != null) {
-        Button(onClick = saveNewSubfolder, modifier = modifier) {
+        FolderEditFieldAndButton(
+            text = uiState.newSubfolder.name,
+            onValueChange = editNewSubfolder,
+            save = saveNewSubfolder,
+            cancelEdit = cancelEdit,
+            modifier = modifier
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FolderEditFieldAndButton(
+    text: String,
+    onValueChange: (String) -> Unit,
+    save: () -> Unit,
+    cancelEdit: () -> Unit,
+    modifier: Modifier
+) {
+    Column(modifier = modifier) {
+        val focusManager = LocalFocusManager.current
+        TextField(
+            value = text,
+            onValueChange = onValueChange,
+            label = {
+                Text(stringResource(R.string.new_subfolder_name))
+            },
+            singleLine = true,
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    focusManager.clearFocus()
+                }
+            ),
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(5.dp)
+        )
+        Button(onClick = save, modifier = Modifier.fillMaxWidth()) {
             Text(text = stringResource(R.string.save))
         }
-        Button(onClick = cancelEdit, modifier = modifier) {
+        Button(onClick = cancelEdit, modifier = Modifier.fillMaxWidth()) {
             Text(text = stringResource(R.string.cancel))
-        }
-    } else {
-        Button(
-            onClick = {},
-            modifier = modifier
-        ) {
-            Text(text = stringResource(R.string.add_words))
-        }
-        Button(
-            onClick = { editNewSubfolder("") },
-            modifier = modifier
-        ) {
-            Text(text = stringResource(R.string.add_subfolder))
-        }
-        Button(
-            onClick = {},
-            modifier = modifier
-        ) {
-            Text(text = stringResource(R.string.edit_subfolders))
         }
     }
 }
