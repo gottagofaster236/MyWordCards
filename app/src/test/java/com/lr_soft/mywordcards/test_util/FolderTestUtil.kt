@@ -12,7 +12,7 @@ object FolderTestUtil {
         Folder(name = "2.1", emptyList(), emptyList(), null, emptyList())
     val root =
         Folder(name = "1", emptyList(), listOf(child, anotherChild), null, emptyList())
-    val rootPath = FolderPath(listOf(root))
+    val rootPath = FolderPath(root)
     val childPath = FolderPath(listOf(root, child))
     val grandchildPath = FolderPath(listOf(root, child, grandchild))
 
@@ -21,7 +21,7 @@ object FolderTestUtil {
     val updatedRoot =
         Folder(name = "1", emptyList(), listOf(updatedChild, anotherChild), null, emptyList())
     val updatedChildPath = FolderPath(listOf(updatedRoot, updatedChild))
-    val updatedRootPath = FolderPath(listOf(updatedRoot))
+    val updatedRootPath = FolderPath(updatedRoot)
 
     val englishGermanWordPairs = listOf(
         WordPair(Word("hello", Language.EN), Word("hallo", Language.DE)),

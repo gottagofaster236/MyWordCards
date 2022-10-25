@@ -6,8 +6,11 @@ import androidx.compose.runtime.Immutable
 data class FolderPath(
     val folders: List<Folder>
 ) {
+
+    constructor(folder: Folder) : this(listOf(folder))
+
     init {
-        check(folders.isNotEmpty()) { "Can't go up from the root folder" }
+        require(folders.isNotEmpty()) { "Can't go up from the root folder" }
     }
 
     val currentFolder: Folder
@@ -24,7 +27,7 @@ data class FolderPath(
     }
 
     fun goToSubfolder(folder: Folder): FolderPath {
-        check(folder in currentFolder.subfolders) {
+        require(folder in currentFolder.subfolders) {
             "Can only go to a subfolder"
         }
         return FolderPath(folders.toMutableList().apply {
@@ -46,18 +49,14 @@ data class FolderPath(
         return FolderPath(newFolders)
     }
 
+    fun updateCurrentFolder(block: Folder.() -> Folder): FolderPath {
+        return updateCurrentFolder(currentFolder.block())
+    }
+
     fun updateSubfolder(subfolder: Folder, newValue: Folder): FolderPath {
         var result = goToSubfolder(subfolder)
         result = result.updateCurrentFolder(newValue)
         result = result.goUpOneFolder()
         return result
-    }
-
-    fun createSubfolder(subfolder: Folder): FolderPath {
-        return updateCurrentFolder(
-            currentFolder.copy(
-                subfolders = currentFolder.subfolders + listOf(subfolder)
-            )
-        )
     }
 }

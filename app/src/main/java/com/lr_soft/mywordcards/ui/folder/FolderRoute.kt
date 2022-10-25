@@ -435,7 +435,7 @@ private fun FolderPreview() {
     MyWordCardsTheme {
         FolderScreen(
             uiState = FolderUiState(
-                path = FolderPath(listOf(rootFolderPreview)),
+                path = FolderPath(rootFolderPreview),
             ),
             snackbarHostState = SnackbarHostState()
         )

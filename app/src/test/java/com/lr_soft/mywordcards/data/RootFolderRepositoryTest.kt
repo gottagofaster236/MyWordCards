@@ -4,9 +4,9 @@ import android.content.Context
 import com.lr_soft.mywordcards.model.*
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.englishFrenchWordPairs
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.englishGermanWordPairs
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -51,13 +51,9 @@ internal class RootFolderRepositoryTest {
             child1.incorrectlyGuessedWordPairs + child2.incorrectlyGuessedWordPairs
     )
 
-    @Before
-    fun setUp() {
-        repository = RootFolderRepository(context)
-    }
-
     @Test
     fun testSaveLoad() = runBlocking {
+        createRepository()
         repository.saveRootFolder(rootFolder)
         val loaded = repository.loadRootFolder()
         assertEquals(rootFolder, loaded)
@@ -65,7 +61,12 @@ internal class RootFolderRepositoryTest {
 
     @Test
     fun testLoadNothing() = runBlocking {
+        createRepository()
         whenever(context.getString(any())) doReturn "root"
         assertEquals(Folder.emptyRootFolder(context), repository.loadRootFolder())
+    }
+
+    private fun CoroutineScope.createRepository() {
+        repository = RootFolderRepository(context, this)
     }
 }

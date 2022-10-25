@@ -27,20 +27,28 @@ internal class FolderPathTest {
     fun testGoUpOneFolder() {
         assertPathEquals(childPath, grandchildPath.goUpOneFolder())
         assertPathEquals(rootPath, childPath.goUpOneFolder())
-        Assert.assertThrows(IllegalStateException::class.java) { rootPath.goUpOneFolder() }
+        Assert.assertThrows(IllegalArgumentException::class.java) { rootPath.goUpOneFolder() }
     }
 
     @Test
     fun testGoTo() {
         assertPathEquals(childPath, rootPath.goToSubfolder(child))
         assertPathEquals(grandchildPath, childPath.goToSubfolder(grandchild))
-        Assert.assertThrows(IllegalStateException::class.java) { rootPath.goToSubfolder(grandchild) }
-        Assert.assertThrows(IllegalStateException::class.java) { rootPath.goToSubfolder(root) }
+        Assert.assertThrows(IllegalArgumentException::class.java) {
+            rootPath.goToSubfolder(grandchild)
+        }
+        Assert.assertThrows(IllegalArgumentException::class.java) {
+            rootPath.goToSubfolder(root)
+        }
     }
 
     @Test
     fun testUpdateCurrentFolder() {
         assertPathEquals(updatedChildPath, childPath.updateCurrentFolder(updatedChild))
+        assertPathEquals(updatedChildPath, childPath.updateCurrentFolder {
+            assertFolderEquals(this, child)
+            updatedChild
+        })
     }
 
     @Test

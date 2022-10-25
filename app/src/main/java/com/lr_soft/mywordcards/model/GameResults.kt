@@ -10,7 +10,7 @@ data class GameResults(
     val totalWordsShown: Int
 ) {
     init {
-        check(totalWordsShown >= 0 && correctAnswers >= 0 && correctAnswers <= totalWordsShown)
+        require(totalWordsShown >= 0 && correctAnswers >= 0 && correctAnswers <= totalWordsShown)
     }
 
     val successRatio: Float = correctAnswers.toFloat() / totalWordsShown

@@ -40,7 +40,7 @@ class FolderViewModel @Inject constructor(
         val path = uiState.path ?: return
         val subfolder = uiState.newSubfolder ?: return
         val newPath = try {
-            path.createSubfolder(Folder(name = subfolder.name))
+            path.updateCurrentFolder { createSubfolder(Folder(name = subfolder.name)) }
         } catch (e: IllegalArgumentException) {
             val userMessage = folderExceptionToString(e)
                 ?: context.getString(R.string.could_not_save_new_subfolder)
@@ -52,10 +52,17 @@ class FolderViewModel @Inject constructor(
         saveRootFolder()
     }
 
+    fun moveSubfolder(subfolder: Folder, up: Boolean) {
+        val path = uiState.path ?: return
+        path.updateCurrentFolder { moveSubfolder(subfolder, up) }
+    }
+
     fun cancelEdit() {
         uiState = uiState.copy(
-            subfolderRename = null,
             newSubfolder = null,
+            newWordPair = null,
+            subfolderRename = null,
+            isEditingSubfolders = false
         )
     }
 
@@ -99,7 +106,7 @@ class FolderViewModel @Inject constructor(
                 }
             }
 
-            val rootPath = FolderPath(listOf(rootFolder))
+            val rootPath = FolderPath(rootFolder)
             uiState = uiState.copy(path = rootPath)
         }
     }
