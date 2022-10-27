@@ -40,7 +40,8 @@ data class FolderPath(
         newFolders[newFolders.lastIndex] = newFolder
         for (i in newFolders.size - 2 downTo 0) {
             val oldSubfolders = folders[i].subfolders
-            val childIndex = oldSubfolders.indexOf(folders[i + 1])
+            val childName = folders[i + 1].name
+            val childIndex = oldSubfolders.indexOfFirst { it.name == childName }
             val newSubfolders = oldSubfolders.toMutableList().apply {
                 this[childIndex] = newFolders[i + 1]
             }
@@ -58,5 +59,28 @@ data class FolderPath(
         result = result.updateCurrentFolder(newValue)
         result = result.goUpOneFolder()
         return result
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) {
+            return true
+        }
+        if (javaClass != other?.javaClass) {
+            return false
+        }
+        other as FolderPath
+
+        if (folders[0] != other.folders[0]) {
+            return false
+        }
+        return getFolderNames() == other.getFolderNames()
+    }
+
+    override fun hashCode(): Int {
+        return getFolderNames().hashCode()
+    }
+
+    private fun getFolderNames(): List<String> {
+        return folders.map(Folder::name)
     }
 }

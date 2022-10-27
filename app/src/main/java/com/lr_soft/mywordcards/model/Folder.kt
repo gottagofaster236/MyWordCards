@@ -35,15 +35,19 @@ data class Folder(
         return copy(subfolders = subfolders + listOf(subfolder))
     }
 
+    fun deleteSubfolder(subfolder: Folder): Folder {
+        TODO()
+    }
+
     /**
-     * Move a [subfolder] [up] or down in the subfolder list,
+     * Move a [subfolder] up or down in the subfolder list,
      * or do nothing if there's nowhere to move the subfolder.
      */
-    fun moveSubfolder(subfolder: Folder, up: Boolean): Folder {
+    fun moveSubfolder(subfolder: Folder, direction: MoveDirection): Folder {
         val index = subfolders.indexOf(subfolder)
         require(index != -1) { "Must be a subfolder" }
 
-        val indexToSwapWith = index + (if (up) -1 else 1)
+        val indexToSwapWith = index + direction.direction
         if (indexToSwapWith !in subfolders.indices) {
             return this
         }
@@ -55,26 +59,17 @@ data class Folder(
         return copy(subfolders = resultSubfolders)
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Folder
-
-        if (name != other.name) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return name.hashCode()
-    }
-
     companion object {
         @JvmStatic
         fun emptyRootFolder(context: Context): Folder {
             return Folder(name = context.getString(R.string.root_folder_name))
         }
+    }
+
+    enum class MoveDirection(
+        val direction: Int
+    ) {
+        UP(-1), DOWN(1)
     }
 }
 

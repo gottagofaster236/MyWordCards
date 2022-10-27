@@ -1,11 +1,11 @@
 package com.lr_soft.mywordcards.model
 
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.anotherChild
-import com.lr_soft.mywordcards.test_util.FolderTestUtil.assertFolderEquals
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.child
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.englishGermanWordPairs
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.root
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.updatedChild
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
@@ -77,7 +77,7 @@ internal class FolderTest {
 
     @Test
     fun testCreateSubfolder() {
-        assertFolderEquals(
+        assertEquals(
             root.copy(subfolders = listOf(child, anotherChild, updatedChild)),
             root.createSubfolder(updatedChild)
         )
@@ -93,19 +93,28 @@ internal class FolderTest {
     fun testMoveSubfolder() {
         // The root folder has two subfolders: "child" and "anotherChild".
         val rootPathWithSubfoldersSwapped = root.copy(subfolders = listOf(anotherChild, child))
-        assertFolderEquals(root, root.moveSubfolder(child, up = true))
-        assertFolderEquals(rootPathWithSubfoldersSwapped, root.moveSubfolder(child, up = false))
-        assertFolderEquals(root, root.moveSubfolder(anotherChild, up = false))
-        assertFolderEquals(rootPathWithSubfoldersSwapped, root.moveSubfolder(child, up = false))
+        assertEquals(root, root.moveSubfolder(child, Folder.MoveDirection.UP))
+        assertEquals(
+            rootPathWithSubfoldersSwapped,
+            root.moveSubfolder(child, Folder.MoveDirection.DOWN)
+        )
+        assertEquals(root, root.moveSubfolder(anotherChild, Folder.MoveDirection.DOWN))
+        assertEquals(
+            rootPathWithSubfoldersSwapped,
+            root.moveSubfolder(child, Folder.MoveDirection.DOWN)
+        )
+
         // Test a folder with three subfolders.
         val threeChildren = root.copy(subfolders = listOf(child, anotherChild, updatedChild))
         val threeChildrenAfterMove =
             root.copy(subfolders = listOf(child, updatedChild, anotherChild))
-        assertFolderEquals(threeChildrenAfterMove,
-            threeChildren.moveSubfolder(updatedChild, up = true))
+        assertEquals(
+            threeChildrenAfterMove,
+            threeChildren.moveSubfolder(updatedChild, Folder.MoveDirection.UP)
+        )
 
         assertThrows(IllegalArgumentException::class.java) {
-            root.moveSubfolder(root, up = true)
+            root.moveSubfolder(root, Folder.MoveDirection.UP)
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.lr_soft.mywordcards.test_util
 
 import com.lr_soft.mywordcards.model.*
-import org.junit.Assert
 
 object FolderTestUtil {
     val grandchild =
@@ -31,20 +30,4 @@ object FolderTestUtil {
         WordPair(Word("hello", Language.EN), Word("bonjour", Language.FR)),
         WordPair(Word("goodbye", Language.EN), Word("au revoir", Language.FR))
     )
-
-    fun assertFolderEquals(expected: Folder, actual: Folder) {
-        Assert.assertEquals(expected.name, actual.name)
-        Assert.assertEquals(expected.wordPairs, actual.wordPairs)
-        Assert.assertEquals(expected.lastGameResults, actual.lastGameResults)
-        Assert.assertEquals(expected.incorrectlyGuessedWordPairs,
-            actual.incorrectlyGuessedWordPairs)
-        Assert.assertEquals(expected.subfolders, actual.subfolders)
-    }
-
-    fun assertPathEquals(expected: FolderPath, actual: FolderPath) {
-        Assert.assertEquals(expected.folders.size, actual.folders.size)
-        for (i in expected.folders.indices) {
-            assertFolderEquals(expected.folders[i], actual.folders[i])
-        }
-    }
 }
