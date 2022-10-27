@@ -66,8 +66,6 @@
     <string name="lang_id">Indonesian</string>
     <string name="lang_yi">Yiddish</string>
     <string name="add_words">Add words</string>
-    <string name="add_subfolder">Add subfolder</string>
-    <string name="edit_subfolders">Edit subfolders</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="new_subfolder_name">New subfolder name</string>
@@ -78,5 +76,11 @@
     <string name="duplicate_subfolders">Duplicate subfolders</string>
     <string name="could_not_save_new_subfolder">Could not save new subfolder</string>
     <string name="go_up_one_folder">Go up one folder</string>
-    <string name="more_options">More options</string>
+    <string name="create_new_subfolder">Create new subfolder</string>
+    <string name="edit_folder">Edit folder</string>
+    <string name="go_to_words_in_selected_subfolders">Go to words in selected subfolders</string>
+    <string name="go_to_words_in_folder">Go to words in folder</string>
+    <string name="delete_folder">Delete folder</string>
+    <string name="move_up">Move up</string>
+    <string name="move_down">Move down</string>
 </resources>

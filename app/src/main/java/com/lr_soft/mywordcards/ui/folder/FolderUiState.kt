@@ -2,29 +2,34 @@ package com.lr_soft.mywordcards.ui.folder
 
 import com.lr_soft.mywordcards.model.Folder
 import com.lr_soft.mywordcards.model.FolderPath
-import com.lr_soft.mywordcards.model.WordPair
 
 data class FolderUiState(
     val path: FolderPath? = null,
-    val newSubfolder: NewSubfolder? = null,
-    val newWordPair: WordPair? = null,
-    val subfolderRename: SubfolderRename? = null,
-    val isEditingSubfolders: Boolean = false,
-    val dropdownMenuExpanded: Boolean = false,
+    val subfolderEdit: SubfolderEdit? = null,
+    val selectedSubfolders: Set<Folder> = emptySet(),
     val userMessage: String? = null,
 ) {
-    val isInEditMode: Boolean
-        get() {
-            return newSubfolder != null || newWordPair != null ||
-                    subfolderRename != null || isEditingSubfolders
-        }
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as FolderUiState
+
+        if (path != other.path) return false
+        if (subfolderEdit != other.subfolderEdit) return false
+        if (selectedSubfolders != other.selectedSubfolders) return false
+        if (userMessage != other.userMessage) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int = 0
 }
 
-data class NewSubfolder(
-    val name: String = ""
-)
-
-data class SubfolderRename(
-    val folder: Folder?,
-    val newName: String
+/**
+ * If [subfolder] is `null`, it's a new folder creation instead.
+ */
+data class SubfolderEdit(
+    val subfolder: Folder?,
+    val newName: String = subfolder?.name ?: ""
 )

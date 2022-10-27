@@ -23,24 +23,61 @@ class FolderViewModel @Inject constructor(
     private val context: Context
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(FolderUiState())
-        private set
+    private var _uiState by mutableStateOf(FolderUiState())
+
+    var uiState: FolderUiState
+        get() = _uiState
+        private set(value) {
+            val haveToSave = _uiState.path != value.path
+            _uiState = value
+            if (haveToSave) {
+                saveRootFolder()
+            }
+        }
 
     init {
         loadRootFolder()
     }
 
-    fun editNewSubfolder(newName: String) {
-        uiState = uiState.copy(
-            newSubfolder = NewSubfolder(newName)
-        )
+    /**
+     * Pass `null` to create a subfolder, otherwise [subfolder] is gonna be edited.
+     */
+    fun startEditingSubfolder(subfolder: Folder?) {
+        cancelSubfolderEdit()
+        uiState = uiState.copy(subfolderEdit = SubfolderEdit(subfolder))
     }
 
-    fun saveNewSubfolder() {
+    fun editSubfolderName(newName: String) {
+        val subfolderUpdate = uiState.subfolderEdit ?: return
+        uiState = uiState.copy(subfolderEdit = subfolderUpdate.copy(newName = newName))
+    }
+
+    fun deleteSubfolder() {
+        val subfolder = uiState.subfolderEdit?.subfolder ?: return
         val path = uiState.path ?: return
-        val subfolder = uiState.newSubfolder ?: return
+        val newPath = path.updateCurrentFolder { deleteSubfolder(subfolder) }
+        uiState = uiState.copy(path = newPath)
+    }
+
+    fun moveSubfolder(direction: Folder.MoveDirection) {
+        val subfolder = uiState.subfolderEdit?.subfolder ?: return
+        val path = uiState.path ?: return
+        val newPath = path.updateCurrentFolder { moveSubfolder(subfolder, direction) }
+        uiState = uiState.copy(path = newPath)
+    }
+
+    fun saveEditedSubfolder() {
+        val path = uiState.path ?: return
+        val edit = uiState.subfolderEdit ?: return
         val newPath = try {
-            path.updateCurrentFolder { createSubfolder(Folder(name = subfolder.name)) }
+            val subfolder = edit.subfolder
+            if (subfolder != null) {
+                path.updateSubfolder(subfolder, subfolder.copy(name = edit.newName))
+            } else {
+                path.updateCurrentFolder {
+                    createSubfolder(Folder(name = edit.newName))
+                }
+            }
         } catch (e: IllegalArgumentException) {
             val userMessage = folderExceptionToString(e)
                 ?: context.getString(R.string.could_not_save_new_subfolder)
@@ -48,21 +85,12 @@ class FolderViewModel @Inject constructor(
             return
         }
 
-        uiState = uiState.copy(path = newPath, newSubfolder = null)
-        saveRootFolder()
+        uiState = uiState.copy(path = newPath, subfolderEdit = null)
     }
 
-    fun moveSubfolder(subfolder: Folder, up: Boolean) {
-        val path = uiState.path ?: return
-        path.updateCurrentFolder { moveSubfolder(subfolder, up) }
-    }
-
-    fun cancelEdit() {
+    fun cancelSubfolderEdit() {
         uiState = uiState.copy(
-            newSubfolder = null,
-            newWordPair = null,
-            subfolderRename = null,
-            isEditingSubfolders = false
+            subfolderEdit = null
         )
     }
 
@@ -71,17 +99,25 @@ class FolderViewModel @Inject constructor(
         uiState = uiState.copy(path = path.goToSubfolder(subfolder))
     }
 
-    fun userMessageShown() {
-        uiState = uiState.copy(userMessage = null)
-    }
-
     fun goUpOneFolder() {
         val path = uiState.path ?: return
         uiState = uiState.copy(path = path.goUpOneFolder())
     }
 
-    fun setDropdownMenuExpanded(expanded: Boolean) {
-        uiState = uiState.copy(dropdownMenuExpanded = expanded)
+    fun goToWords() {
+        TODO()
+    }
+
+    fun toggleSubfolderSelection(subfolder: Folder) {
+        TODO()
+    }
+
+    fun deselectAllSubfolders() {
+        TODO()
+    }
+
+    fun userMessageShown() {
+        uiState = uiState.copy(userMessage = null)
     }
 
     private fun folderExceptionToString(e: Exception): String? {
