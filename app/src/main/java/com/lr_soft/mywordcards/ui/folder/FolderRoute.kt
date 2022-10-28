@@ -281,21 +281,13 @@ private fun FolderItemContainer(
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
-    val color = if (isSelected) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        MaterialTheme.colorScheme.primaryContainer
-    }
-    val cardColors = CardDefaults.cardColors(
-        containerColor = color
+    val modifierClickable = modifier.combinedClickable(
+        onClick = goToSubfolder, onLongClick = toggleSubfolderSelection
     )
-    Card(
-        modifier = modifier.combinedClickable(
-            onClick = goToSubfolder, onLongClick = toggleSubfolderSelection
-        ),
-        colors = cardColors
-    ) {
-        content()
+    if (isSelected) {
+        ElevatedCard(modifier = modifierClickable) { content() }
+    } else {
+        Card(modifier = modifierClickable) { content() }
     }
 }
 
@@ -454,7 +446,8 @@ private val folderPreview = Folder(
 private val rootFolderPreview = Folder(
     name = "root",
     wordPairs = englishGermanWordPairs,
-    subfolders = listOf(folderPreview, folderPreview.copy(name = "en to de")),
+    subfolders = listOf(folderPreview, folderPreview.copy(name = "en to de"),
+        folderPreview.copy(name = "fr to en")),
     lastGameResults = null,
     incorrectlyGuessedWordPairs = englishGermanWordPairs
 )
@@ -506,6 +499,8 @@ private fun FolderPreview() {
         FolderScreen(
             uiState = FolderUiState(
                 path = FolderPath(rootFolderPreview),
+                selectedSubfolders = setOf(rootFolderPreview.subfolders.last()),
+                userMessage = "Toast"
             ),
             snackbarHostState = SnackbarHostState()
         )
