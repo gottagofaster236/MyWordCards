@@ -59,6 +59,10 @@ data class Folder(
         return copy(subfolders = resultSubfolders)
     }
 
+    fun rename(newName: String): Folder {
+        return copy(name = newName)
+    }
+
     companion object {
         @JvmStatic
         fun emptyRootFolder(context: Context): Folder {

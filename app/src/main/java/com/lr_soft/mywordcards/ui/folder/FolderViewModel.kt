@@ -43,8 +43,11 @@ class FolderViewModel @Inject constructor(
      * Pass `null` to create a subfolder, otherwise [subfolder] is gonna be edited.
      */
     fun startEditingSubfolder(subfolder: Folder?) {
-        cancelSubfolderEdit()
-        uiState = uiState.copy(subfolderEdit = SubfolderEdit(subfolder))
+        val currentFolderSubfolders = uiState.path?.currentFolder?.subfolders ?: return
+        if (subfolder == null || subfolder in currentFolderSubfolders) {
+            cancelSubfolderEdit()
+            uiState = uiState.copy(subfolderEdit = SubfolderEdit(subfolder))
+        }
     }
 
     fun editSubfolderName(newName: String) {
@@ -72,7 +75,7 @@ class FolderViewModel @Inject constructor(
         val newPath = try {
             val subfolder = edit.subfolder
             if (subfolder != null) {
-                path.updateSubfolder(subfolder, subfolder.copy(name = edit.newName))
+                path.updateSubfolder(subfolder, subfolder.rename(edit.newName))
             } else {
                 path.updateCurrentFolder {
                     createSubfolder(Folder(name = edit.newName))
