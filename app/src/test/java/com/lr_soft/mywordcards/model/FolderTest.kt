@@ -3,6 +3,7 @@ package com.lr_soft.mywordcards.model
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.anotherChild
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.child
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.englishGermanWordPairs
+import com.lr_soft.mywordcards.test_util.FolderTestUtil.grandchild
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.root
 import com.lr_soft.mywordcards.test_util.FolderTestUtil.updatedChild
 import org.junit.Assert.assertEquals
@@ -87,6 +88,15 @@ internal class FolderTest {
         assertThrows(InvalidFolderNameException::class.java) {
             root.createSubfolder(Folder(name = "  "))
         }
+    }
+
+    @Test
+    fun testDeleteSubfolder() {
+        assertThrows(IllegalArgumentException::class.java) {
+            root.deleteSubfolder(grandchild)
+        }
+        val rootWithoutChild = root.deleteSubfolder(child)
+        assertEquals(root.copy(subfolders = listOf(anotherChild)), rootWithoutChild)
     }
 
     @Test

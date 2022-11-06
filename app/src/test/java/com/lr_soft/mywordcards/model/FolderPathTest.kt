@@ -43,7 +43,7 @@ internal class FolderPathTest {
     }
 
     @Test
-    fun testGoTo() {
+    fun testGoToSubfoler() {
         assertEquals(childPath, rootPath.goToSubfolder(child))
         assertEquals(grandchildPath, childPath.goToSubfolder(grandchild))
         assertThrows(IllegalArgumentException::class.java) {
@@ -66,5 +66,12 @@ internal class FolderPathTest {
     @Test
     fun testUpdateSubfolder() {
         assertEquals(updatedRootPath, rootPath.updateSubfolder(child, updatedChild))
+    }
+
+    @Test
+    fun testRootFolder() {
+        assertEquals(root, rootPath.rootFolder)
+        assertEquals(root, childPath.rootFolder)
+        assertEquals(root, grandchildPath.rootFolder)
     }
 }

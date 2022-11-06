@@ -36,7 +36,9 @@ data class Folder(
     }
 
     fun deleteSubfolder(subfolder: Folder): Folder {
-        TODO()
+        val newSubfolders = subfolders.toMutableList()
+        require(newSubfolders.remove(subfolder)) { "Should be a subfolder" }
+        return copy(subfolders = newSubfolders)
     }
 
     /**

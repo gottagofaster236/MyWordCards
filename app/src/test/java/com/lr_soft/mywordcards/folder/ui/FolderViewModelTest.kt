@@ -53,6 +53,7 @@ internal class FolderViewModelTest {
     @Test
     fun testConstructor() {
         verifyBlocking(rootFolderRepository, times(1)) { loadRootFolder() }
+        verifyBlocking(rootFolderRepository, never()) { saveRootFolder(any()) }
         assertNull(viewModel.uiState.userMessage)
     }
 
@@ -192,6 +193,7 @@ internal class FolderViewModelTest {
         viewModel.saveEditedSubfolder()  // Saving with blank name
         advanceUntilIdle()
         assertNotNull(viewModel.uiState.userMessage)
+        verifyBlocking(rootFolderRepository, never()) { saveRootFolder(any()) }
     }
 
     @Test
@@ -208,31 +210,106 @@ internal class FolderViewModelTest {
 
     @Test
     fun testGoToSubfolder() {
+        assertEquals(FolderTestUtil.root, viewModel.uiState.path?.currentFolder)
+        assertDoesNothing {
+            viewModel.goToSubfolder(FolderTestUtil.grandchild)
+        }
+        viewModel.goToSubfolder(FolderTestUtil.child)
+        assertEquals(FolderTestUtil.child, viewModel.uiState.path?.currentFolder)
     }
 
     @Test
     fun testGoUpOneFolder() {
+        assertEquals(FolderTestUtil.root, viewModel.uiState.path?.currentFolder)
+        assertDoesNothing {
+            viewModel.goUpOneFolder()
+        }
+
+        viewModel.goToSubfolder(FolderTestUtil.child)
+        assertEquals(FolderTestUtil.child, viewModel.uiState.path?.currentFolder)
+        viewModel.goToSubfolder(FolderTestUtil.grandchild)
+        assertEquals(FolderTestUtil.grandchild, viewModel.uiState.path?.currentFolder)
+
+        viewModel.goUpOneFolder()
+        assertEquals(FolderTestUtil.child, viewModel.uiState.path?.currentFolder)
+        viewModel.goUpOneFolder()
+        assertEquals(FolderTestUtil.root, viewModel.uiState.path?.currentFolder)
     }
 
     @Test
     fun testGoToWords() {
+
     }
 
     @Test
     fun testToggleSubfolderSelection() {
+        assertEquals(emptySet<Folder>(), viewModel.uiState.selectedSubfolders)
+        assertDoesNothing {
+            viewModel.toggleSubfolderSelection(FolderTestUtil.grandchild)
+        }
+
+        viewModel.toggleSubfolderSelection(FolderTestUtil.child)
+        assertEquals(setOf(FolderTestUtil.child), viewModel.uiState.selectedSubfolders)
+
+        viewModel.toggleSubfolderSelection(FolderTestUtil.anotherChild)
+        assertEquals(
+            setOf(FolderTestUtil.child, FolderTestUtil.anotherChild),
+            viewModel.uiState.selectedSubfolders
+        )
+
+        viewModel.toggleSubfolderSelection(FolderTestUtil.child)
+        assertEquals(setOf(FolderTestUtil.anotherChild), viewModel.uiState.selectedSubfolders)
+
+        viewModel.toggleSubfolderSelection(FolderTestUtil.anotherChild)
+        assertEquals(emptySet<Folder>(), viewModel.uiState.selectedSubfolders)
     }
 
     @Test
     fun testDeselectAllSubfolders() {
+        assertEquals(emptySet<Folder>(), viewModel.uiState.selectedSubfolders)
+        assertDoesNothing {
+            viewModel.deselectAllSubfolders()
+        }
+        viewModel.toggleSubfolderSelection(FolderTestUtil.child)
+        viewModel.toggleSubfolderSelection(FolderTestUtil.anotherChild)
+        assertEquals(
+            setOf(FolderTestUtil.child, FolderTestUtil.anotherChild),
+            viewModel.uiState.selectedSubfolders
+        )
+
+        viewModel.deselectAllSubfolders()
+        assertEquals(emptySet<Folder>(), viewModel.uiState.selectedSubfolders)
     }
 
     @Test
     fun testUserMessageShown() {
+        assertNull(viewModel.uiState.userMessage)
+        assertDoesNothing {
+            viewModel.userMessageShown()
+        }
+
+        viewModel.startEditingSubfolder(null)
+        viewModel.saveEditedSubfolder()  // Saving subfolder with an empty name.
+        assertNotNull(viewModel.uiState.userMessage)
+
+        viewModel.userMessageShown()
+        assertNull(viewModel.uiState.userMessage)
     }
 
     @Test
-    fun testSaveRootFolderErrors() {
+    fun testSaveRootFolderInSubfolder() = runTest {
+        viewModel.goToSubfolder(FolderTestUtil.child)
+        viewModel.startEditingSubfolder(null)
+        viewModel.editSubfolderName("New folder in child")
+        viewModel.saveEditedSubfolder()
 
+        val expectedPath = FolderTestUtil.rootPath
+            .goToSubfolder(FolderTestUtil.child)
+            .updateCurrentFolder { createSubfolder(Folder("New folder in child")) }
+        assertEquals(expectedPath, viewModel.uiState.path)
+
+        advanceUntilIdle()
+        verifyBlocking(rootFolderRepository) { saveRootFolder(expectedPath.rootFolder) }
     }
 
     private fun assertDoesNothing(block: () -> Unit) {
