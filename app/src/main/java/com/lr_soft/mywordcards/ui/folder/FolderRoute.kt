@@ -285,9 +285,9 @@ private fun FolderItemContainer(
         onLongClick = onLongClick
     )
     if (isSelected) {
-        ElevatedCard(modifier = modifierClickable) { content() }
-    } else {
         Card(modifier = modifierClickable) { content() }
+    } else {
+        ElevatedCard(modifier = modifierClickable) { content() }
     }
 }
 
