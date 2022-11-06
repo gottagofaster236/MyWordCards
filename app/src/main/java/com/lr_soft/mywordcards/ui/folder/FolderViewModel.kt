@@ -57,7 +57,10 @@ class FolderViewModel @Inject constructor(
         val currentFolderSubfolders = uiState.path?.currentFolder?.subfolders ?: return
         if (subfolder == null || subfolder in currentFolderSubfolders) {
             cancelSubfolderEdit()
-            uiState = uiState.copy(subfolderEdit = SubfolderEdit(subfolder))
+            uiState = uiState.copy(
+                subfolderEdit = SubfolderEdit(subfolder),
+                selectedSubfolders = emptySet()
+            )
         }
     }
 
@@ -113,13 +116,21 @@ class FolderViewModel @Inject constructor(
         if (subfolder !in path.currentFolder.subfolders) {
             return
         }
-        uiState = uiState.copy(path = path.goToSubfolder(subfolder))
+        uiState = uiState.copy(
+            path = path.goToSubfolder(subfolder),
+            subfolderEdit = null,
+            selectedSubfolders = emptySet()
+        )
     }
 
     fun goUpOneFolder() {
         val path = uiState.path ?: return
         if (path.currentFolder != path.rootFolder) {
-            uiState = uiState.copy(path = path.goUpOneFolder())
+            uiState = uiState.copy(
+                path = path.goUpOneFolder(),
+                subfolderEdit = null,
+                selectedSubfolders = emptySet()
+            )
         }
     }
 
@@ -138,7 +149,7 @@ class FolderViewModel @Inject constructor(
         } else {
             newSelectedSubfolders.add(subfolder)
         }
-        uiState = uiState.copy(selectedSubfolders = newSelectedSubfolders)
+        uiState = uiState.copy(selectedSubfolders = newSelectedSubfolders, subfolderEdit = null)
     }
 
     fun deselectAllSubfolders() {

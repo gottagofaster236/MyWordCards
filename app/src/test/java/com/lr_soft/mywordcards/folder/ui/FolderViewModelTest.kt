@@ -89,6 +89,17 @@ internal class FolderViewModelTest {
     }
 
     @Test
+    fun testStartEditingSubfolderWithSelection() {
+        viewModel.toggleSubfolderSelection(FolderTestUtil.child)
+        assertEquals(setOf(FolderTestUtil.child), viewModel.uiState.selectedSubfolders)
+        assertNull(viewModel.uiState.subfolderEdit)
+
+        viewModel.startEditingSubfolder(null)
+        assertNotNull(viewModel.uiState.subfolderEdit)
+        assertEquals(emptySet<Folder>(), viewModel.uiState.selectedSubfolders)
+    }
+
+    @Test
     fun testEditSubfolderName() {
         assertDoesNothing {
             viewModel.editSubfolderName("New name")
@@ -219,6 +230,23 @@ internal class FolderViewModelTest {
     }
 
     @Test
+    fun testGoToSubfolderWithEditOrSelection() {
+        assertEquals(FolderTestUtil.root, viewModel.uiState.path?.currentFolder)
+        viewModel.startEditingSubfolder(null)
+        assertNotNull(viewModel.uiState.subfolderEdit)
+
+        viewModel.goToSubfolder(FolderTestUtil.child)
+        assertEquals(FolderTestUtil.child, viewModel.uiState.path?.currentFolder)
+        assertNull(viewModel.uiState.subfolderEdit)
+        viewModel.toggleSubfolderSelection(FolderTestUtil.grandchild)
+        assertEquals(setOf(FolderTestUtil.grandchild), viewModel.uiState.selectedSubfolders)
+
+        viewModel.goToSubfolder(FolderTestUtil.grandchild)
+        assertEquals(FolderTestUtil.grandchild, viewModel.uiState.path?.currentFolder)
+        assertEquals(emptySet<Folder>(), viewModel.uiState.selectedSubfolders)
+    }
+
+    @Test
     fun testGoUpOneFolder() {
         assertEquals(FolderTestUtil.root, viewModel.uiState.path?.currentFolder)
         assertDoesNothing {
@@ -234,6 +262,26 @@ internal class FolderViewModelTest {
         assertEquals(FolderTestUtil.child, viewModel.uiState.path?.currentFolder)
         viewModel.goUpOneFolder()
         assertEquals(FolderTestUtil.root, viewModel.uiState.path?.currentFolder)
+    }
+
+    @Test
+    fun testGoUpOneFolderWithEditOrSelection() {
+        viewModel.goToSubfolder(FolderTestUtil.child)
+        viewModel.goToSubfolder(FolderTestUtil.grandchild)
+        assertEquals(FolderTestUtil.grandchild, viewModel.uiState.path?.currentFolder)
+        viewModel.startEditingSubfolder(null)
+        assertNotNull(viewModel.uiState.subfolderEdit)
+
+
+        viewModel.goUpOneFolder()
+        assertEquals(FolderTestUtil.child, viewModel.uiState.path?.currentFolder)
+        assertNull(viewModel.uiState.subfolderEdit)
+        viewModel.toggleSubfolderSelection(FolderTestUtil.grandchild)
+        assertEquals(setOf(FolderTestUtil.grandchild), viewModel.uiState.selectedSubfolders)
+
+        viewModel.goUpOneFolder()
+        assertEquals(FolderTestUtil.root, viewModel.uiState.path?.currentFolder)
+        assertEquals(emptySet<Folder>(), viewModel.uiState.selectedSubfolders)
     }
 
     @Test
@@ -262,6 +310,15 @@ internal class FolderViewModelTest {
 
         viewModel.toggleSubfolderSelection(FolderTestUtil.anotherChild)
         assertEquals(emptySet<Folder>(), viewModel.uiState.selectedSubfolders)
+    }
+
+    @Test
+    fun testToggleSubfolderSelectionWithEdit() {
+        viewModel.startEditingSubfolder(null)
+        assertNotNull(viewModel.uiState.subfolderEdit)
+        viewModel.toggleSubfolderSelection(FolderTestUtil.child)
+        assertNull(viewModel.uiState.subfolderEdit)
+        assertEquals(setOf(FolderTestUtil.child), viewModel.uiState.selectedSubfolders)
     }
 
     @Test
