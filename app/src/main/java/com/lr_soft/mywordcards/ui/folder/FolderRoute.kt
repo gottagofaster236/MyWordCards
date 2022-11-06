@@ -203,26 +203,25 @@ private fun FolderScreenContent(
     ) {
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(folders) { folder ->
+                val onClick = if (uiState.selectedSubfolders.isEmpty()){
+                    goToSubfolder
+                } else {
+                    toggleSubfolderSelection
+                }
                 FolderItem(
-                    folder = folder,
-                    editMode = folder == uiState.subfolderEdit?.subfolder,
+                    folder = folder, editMode = folder == uiState.subfolderEdit?.subfolder,
                     isSelected = folder in uiState.selectedSubfolders,
                     startEditingSubfolder = { startEditingSubfolder(folder) },
-                    deleteSubfolder = deleteSubfolder,
-                    moveSubfolder = moveSubfolder,
-                    toggleSubfolderSelection = { toggleSubfolderSelection(folder) },
-                    goToSubfolder = { goToSubfolder(folder) },
+                    deleteSubfolder = deleteSubfolder, moveSubfolder = moveSubfolder,
+                    onClick = { onClick(folder) }, onLongClick = { toggleSubfolderSelection(folder) },
                     modifier = Modifier.padding(5.dp)
                 )
             }
         }
         FolderBottomControls(
-            uiState = uiState,
-            editSubfolderName = editSubfolderName,
-            saveEditedSubfolder = saveEditedSubfolder,
-            cancelSubfolderEdit = cancelSubfolderEdit,
-            goToWords = goToWords,
-            modifier = Modifier.fillMaxWidth()
+            uiState = uiState, editSubfolderName = editSubfolderName,
+            saveEditedSubfolder = saveEditedSubfolder, cancelSubfolderEdit = cancelSubfolderEdit,
+            goToWords = goToWords, modifier = Modifier.fillMaxWidth()
         )
     }
 }
@@ -236,12 +235,12 @@ private fun FolderItem(
     startEditingSubfolder: () -> Unit = {},
     deleteSubfolder: () -> Unit = {},
     moveSubfolder: (Folder.MoveDirection) -> Unit = {},
-    toggleSubfolderSelection: () -> Unit = {},
-    goToSubfolder: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     FolderItemContainer(
-        isSelected = isSelected, toggleSubfolderSelection = toggleSubfolderSelection,
-        goToSubfolder = goToSubfolder, modifier = modifier
+        isSelected = isSelected, onClick = onClick,
+        onLongClick = onLongClick, modifier = modifier
     ) {
         Row(
             modifier = Modifier.padding(10.dp),
@@ -276,13 +275,14 @@ private fun FolderItem(
 @Composable
 private fun FolderItemContainer(
     isSelected: Boolean,
-    toggleSubfolderSelection: () -> Unit,
-    goToSubfolder: () -> Unit,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier,
     content: @Composable () -> Unit
 ) {
     val modifierClickable = modifier.combinedClickable(
-        onClick = goToSubfolder, onLongClick = toggleSubfolderSelection
+        onClick = onClick,
+        onLongClick = onLongClick
     )
     if (isSelected) {
         ElevatedCard(modifier = modifierClickable) { content() }
