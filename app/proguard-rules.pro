@@ -19,7 +19,7 @@
 }
 # lookup for plugin generated serializable classes
 -if @kotlinx.serialization.Serializable class com.lr_soft.mywordcards.data.**
--keepclassmembers class com.yourcompany.yourpackage.<1>$Companion {
+-keepclassmembers class com.lr_soft.mywordcards.data.<1>$Companion {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

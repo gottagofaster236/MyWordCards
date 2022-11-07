@@ -31,7 +31,7 @@ android {
     }
     kotlinOptions {
         jvmTarget = "1.8"
-        freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -52,18 +52,20 @@ android {
 }
 
 dependencies {
-    val composeUiVersion: String by rootProject.extra
     val hiltVersion: String by rootProject.extra
     val mockitoVersion: String by rootProject.extra
-    val mockitoKotlinVersion: String by rootProject.extra
     val navVersion: String by rootProject.extra
+
+    val composeBom = platform("androidx.compose:compose-bom:2022.10.00")
+    implementation(composeBom)
+    androidTestImplementation(composeBom)
+
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-    implementation("androidx.activity:activity-compose:1.6.0")
-    implementation("androidx.compose.ui:ui:$composeUiVersion")
-    implementation("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation("androidx.compose.material:material-icons-extended:$composeUiVersion")
-    implementation("androidx.compose.material3:material3:1.0.0-rc01")
+    implementation("androidx.activity:activity-compose:1.6.1")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.material3:material3")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
@@ -75,11 +77,11 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.mockito:mockito-core:$mockitoVersion")
     testImplementation("org.mockito:mockito-inline:$mockitoVersion")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:$mockitoKotlinVersion")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:4.0.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeUiVersion")
-    debugImplementation("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
