@@ -10,7 +10,7 @@
 
 # Application rules
 
--keepclassmembers @kotlinx.serialization.Serializable class com.lr_soft.mywordcards.data.** {
+-keepclassmembers @kotlinx.serialization.Serializable class com.lr_soft.mywordcards.model.** {
     # lookup for plugin generated serializable classes
     *** Companion;
     # lookup for serializable objects
@@ -18,8 +18,8 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 # lookup for plugin generated serializable classes
--if @kotlinx.serialization.Serializable class com.lr_soft.mywordcards.data.**
--keepclassmembers class com.lr_soft.mywordcards.data.<1>$Companion {
+-if @kotlinx.serialization.Serializable class com.lr_soft.mywordcards.model.**
+-keepclassmembers class com.lr_soft.mywordcards.model.<1>$Companion {
     kotlinx.serialization.KSerializer serializer(...);
 }
 
