@@ -42,7 +42,9 @@ fun FolderRoute(
         snackbarHostState = snackbarHostState,
         startEditingSubfolder = viewModel::startEditingSubfolder,
         editSubfolderName = viewModel::editSubfolderName,
-        deleteSubfolder = viewModel::deleteSubfolder,
+        showDeleteSubfolderDialog = viewModel::showDeleteSubfolderDialog,
+        dismissDeleteSubfolder = viewModel::dismissDeleteSubfolder,
+        confirmDeleteSubfolder = viewModel::confirmDeleteSubfolder,
         moveSubfolder = viewModel::moveSubfolder,
         saveEditedSubfolder = viewModel::saveEditedSubfolder,
         cancelSubfolderEdit = viewModel::cancelSubfolderEdit,
@@ -62,7 +64,9 @@ private fun FolderScreen(
     snackbarHostState: SnackbarHostState,
     startEditingSubfolder: (Folder?) -> Unit = {},
     editSubfolderName: (String) -> Unit = {},
-    deleteSubfolder: () -> Unit = {},
+    showDeleteSubfolderDialog: () -> Unit = {},
+    dismissDeleteSubfolder: () -> Unit = {},
+    confirmDeleteSubfolder: () -> Unit = {},
     moveSubfolder: (Folder.MoveDirection) -> Unit = {},
     saveEditedSubfolder: () -> Unit = {},
     cancelSubfolderEdit: () -> Unit = {},
@@ -86,18 +90,26 @@ private fun FolderScreen(
         FolderScreenContent(
             uiState = uiState, modifier = Modifier.padding(innerPaddingModifier),
             startEditingSubfolder = startEditingSubfolder, editSubfolderName = editSubfolderName,
-            deleteSubfolder = deleteSubfolder, moveSubfolder = moveSubfolder,
+            showDeleteSubfolderDialog = showDeleteSubfolderDialog, moveSubfolder = moveSubfolder,
             saveEditedSubfolder = saveEditedSubfolder, cancelSubfolderEdit = cancelSubfolderEdit,
             goToSubfolder = goToSubfolder, goToWords = goToWords,
             toggleSubfolderSelection = toggleSubfolderSelection,
         )
     }
 
-    ShowUserMessage(
+    UserMessage(
         userMessage = uiState.userMessage,
         snackbarHostState = snackbarHostState,
         userMessageShown = userMessageShown
     )
+
+    if (uiState.subfolderEdit != null && uiState.subfolderEdit.showDeleteDialog) {
+        DeleteSubfolderDialog(
+            subfolderName = uiState.subfolderEdit.newName,
+            dismissDeleteSubfolder = dismissDeleteSubfolder,
+            confirmDeleteSubfolder = confirmDeleteSubfolder
+        )
+    }
 
     BackHandler(uiState.subfolderEdit != null || uiState.selectedSubfolders.isNotEmpty()) {
         if (uiState.subfolderEdit != null) {
@@ -187,7 +199,7 @@ private fun FolderScreenContent(
     modifier: Modifier,
     startEditingSubfolder: (Folder?) -> Unit = {},
     editSubfolderName: (String) -> Unit = {},
-    deleteSubfolder: () -> Unit = {},
+    showDeleteSubfolderDialog: () -> Unit = {},
     moveSubfolder: (Folder.MoveDirection) -> Unit = {},
     saveEditedSubfolder: () -> Unit = {},
     cancelSubfolderEdit: () -> Unit = {},
@@ -212,7 +224,7 @@ private fun FolderScreenContent(
                     folder = folder, editMode = folder == uiState.subfolderEdit?.subfolder,
                     isSelected = folder in uiState.selectedSubfolders,
                     startEditingSubfolder = { startEditingSubfolder(folder) },
-                    deleteSubfolder = deleteSubfolder, moveSubfolder = moveSubfolder,
+                    showDeleteSubfolderDialog = showDeleteSubfolderDialog, moveSubfolder = moveSubfolder,
                     onClick = { onClick(folder) }, onLongClick = { toggleSubfolderSelection(folder) },
                     modifier = Modifier.padding(5.dp)
                 )
@@ -233,7 +245,7 @@ private fun FolderItem(
     isSelected: Boolean,
     modifier: Modifier = Modifier,
     startEditingSubfolder: () -> Unit = {},
-    deleteSubfolder: () -> Unit = {},
+    showDeleteSubfolderDialog: () -> Unit = {},
     moveSubfolder: (Folder.MoveDirection) -> Unit = {},
     onClick: () -> Unit = {},
     onLongClick: () -> Unit = {}
@@ -259,7 +271,10 @@ private fun FolderItem(
                 maxLines = 1
             )
             if (editMode) {
-                FolderEditModeButtons(deleteSubfolder = deleteSubfolder, moveSubfolder = moveSubfolder)
+                FolderEditModeButtons(
+                    showDeleteSubfolderDialog = showDeleteSubfolderDialog,
+                    moveSubfolder = moveSubfolder
+                )
             } else {
                 FolderNormalButtons(startEditingSubfolder = startEditingSubfolder)
             }
@@ -293,12 +308,12 @@ private fun FolderItemContainer(
 
 @Composable
 private fun FolderEditModeButtons(
-    deleteSubfolder: () -> Unit,
+    showDeleteSubfolderDialog: () -> Unit,
     moveSubfolder: (Folder.MoveDirection) -> Unit,
 ) {
     CustomIconButton(
         imageVector = Icons.Default.Delete,
-        onClick = deleteSubfolder,
+        onClick = showDeleteSubfolderDialog,
         contentDescription = stringResource(R.string.delete_folder),
         tint = MaterialTheme.colorScheme.primary,
     )
@@ -414,7 +429,7 @@ private fun SubfolderEditControls(
 }
 
 @Composable
-private fun ShowUserMessage(
+private fun UserMessage(
     userMessage: String?,
     snackbarHostState: SnackbarHostState,
     userMessageShown: () -> Unit
@@ -426,6 +441,29 @@ private fun ShowUserMessage(
         snackbarHostState.showSnackbar(userMessage)
         userMessageShown()
     }
+}
+
+@Composable
+private fun DeleteSubfolderDialog(
+    subfolderName: String,
+    dismissDeleteSubfolder: () -> Unit,
+    confirmDeleteSubfolder: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = dismissDeleteSubfolder,
+        title = { Text(stringResource(R.string.confirm_delete)) },
+        text = { Text(stringResource(R.string.click_delete_to_confirm, subfolderName)) },
+        confirmButton = {
+            Button(onClick = confirmDeleteSubfolder) {
+                Text("Delete")
+            }
+        },
+        dismissButton = {
+            Button(onClick = dismissDeleteSubfolder) {
+                Text("Cancel")
+            }
+        }
+    )
 }
 
 // Data for preview.

@@ -118,23 +118,49 @@ internal class FolderViewModelTest {
     }
 
     @Test
-    fun testDeleteSubfolder() = runTest {
-        assertDoesNothing {
-            viewModel.deleteSubfolder()
-        }
-
+    fun testShowDeleteSubfolderDialog() {
         viewModel.startEditingSubfolder(null)
         assertDoesNothing {
-            viewModel.deleteSubfolder()
-        }
-
-        viewModel.startEditingSubfolder(FolderTestUtil.root)
-        assertDoesNothing {
-            viewModel.deleteSubfolder()
+            // Shouldn't be able to delete a subfolder that's not created yet.
+            viewModel.showDeleteSubfolderDialog()
         }
 
         viewModel.startEditingSubfolder(FolderTestUtil.child)
-        viewModel.deleteSubfolder()
+        assertEquals(false, viewModel.uiState.subfolderEdit?.showDeleteDialog)
+        viewModel.showDeleteSubfolderDialog()
+        assertEquals(true, viewModel.uiState.subfolderEdit?.showDeleteDialog)
+
+        assertDoesNothing {
+            viewModel.showDeleteSubfolderDialog()
+        }
+    }
+
+    @Test
+    fun testDismissDeleteSubfolder() {
+        assertDoesNothing {
+            viewModel.dismissDeleteSubfolder()
+        }
+        viewModel.startEditingSubfolder(FolderTestUtil.child)
+        assertDoesNothing {
+            viewModel.dismissDeleteSubfolder()
+        }
+        viewModel.showDeleteSubfolderDialog()
+        assertEquals(true, viewModel.uiState.subfolderEdit?.showDeleteDialog)
+        viewModel.dismissDeleteSubfolder()
+        assertEquals(false, viewModel.uiState.subfolderEdit?.showDeleteDialog)
+    }
+
+    @Test
+    fun testConfirmDeleteSubfolder() = runTest {
+        assertDoesNothing {
+            viewModel.confirmDeleteSubfolder()
+        }
+        viewModel.startEditingSubfolder(FolderTestUtil.child)
+        assertDoesNothing {
+            viewModel.confirmDeleteSubfolder()
+        }
+        viewModel.showDeleteSubfolderDialog()
+        viewModel.confirmDeleteSubfolder()
         advanceUntilIdle()
         assertRootFolderEquals(FolderTestUtil.root.deleteSubfolder(FolderTestUtil.child))
         assertNull(viewModel.uiState.subfolderEdit)

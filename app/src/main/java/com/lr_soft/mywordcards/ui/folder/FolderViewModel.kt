@@ -69,7 +69,23 @@ class FolderViewModel @Inject constructor(
         uiState = uiState.copy(subfolderEdit = subfolderUpdate.copy(newName = newName))
     }
 
-    fun deleteSubfolder() {
+    fun showDeleteSubfolderDialog() {
+        val subfolderEdit = uiState.subfolderEdit ?: return
+        if (subfolderEdit.subfolder == null) {
+            return
+        }
+        uiState = uiState.copy(subfolderEdit = subfolderEdit.copy(showDeleteDialog = true))
+    }
+
+    fun dismissDeleteSubfolder() {
+        val subfolderEdit = uiState.subfolderEdit ?: return
+        uiState = uiState.copy(subfolderEdit = subfolderEdit.copy(showDeleteDialog = false))
+    }
+
+    fun confirmDeleteSubfolder() {
+        if (uiState.subfolderEdit?.showDeleteDialog != true) {
+            return
+        }
         val subfolder = uiState.subfolderEdit?.subfolder ?: return
         val path = uiState.path ?: return
         val newPath = path.updateCurrentFolder { deleteSubfolder(subfolder) }

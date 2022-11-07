@@ -31,5 +31,6 @@ data class FolderUiState(
  */
 data class SubfolderEdit(
     val subfolder: Folder?,
-    val newName: String = subfolder?.name ?: ""
+    val newName: String = subfolder?.name ?: "",
+    val showDeleteDialog: Boolean = false,
 )
