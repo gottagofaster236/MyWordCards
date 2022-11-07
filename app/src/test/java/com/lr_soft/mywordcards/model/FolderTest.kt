@@ -43,7 +43,7 @@ internal class FolderTest {
             Folder(
                 name = "folder",
                 wordPairs = englishGermanWordPairs,
-                subfolders = listOf(child, child),
+                subfolders = listOf(child, child.copy(lastGameResults = GameResults(0, 0))),
                 lastGameResults = null,
                 incorrectlyGuessedWordPairs = englishGermanWordPairs
             )

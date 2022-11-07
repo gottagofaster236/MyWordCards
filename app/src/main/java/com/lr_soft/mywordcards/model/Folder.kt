@@ -22,7 +22,7 @@ data class Folder(
         if (hasDuplicates(wordPairs) || hasDuplicates(incorrectlyGuessedWordPairs)) {
             throw DuplicateWordPairsException()
         }
-        if (hasDuplicates(subfolders)) {
+        if (hasDuplicates(subfolders.map(Folder::name))) {
             throw DuplicateSubfoldersException()
         }
     }
