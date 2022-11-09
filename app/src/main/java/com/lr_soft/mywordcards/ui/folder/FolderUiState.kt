@@ -1,8 +1,10 @@
 package com.lr_soft.mywordcards.ui.folder
 
+import androidx.compose.runtime.Immutable
 import com.lr_soft.mywordcards.model.Folder
 import com.lr_soft.mywordcards.model.FolderPath
 
+@Immutable
 data class FolderUiState(
     val path: FolderPath? = null,
     val subfolderEdit: SubfolderEdit? = null,

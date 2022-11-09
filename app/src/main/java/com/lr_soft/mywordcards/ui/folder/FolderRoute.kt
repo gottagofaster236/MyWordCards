@@ -111,13 +111,10 @@ private fun FolderScreen(
         )
     }
 
-    BackHandler(uiState.subfolderEdit != null || uiState.selectedSubfolders.isNotEmpty()) {
-        if (uiState.subfolderEdit != null) {
-            cancelSubfolderEdit()
-        } else {
-            deselectAllSubfolders()
-        }
-    }
+    FolderBackHandler(
+        uiState = uiState, cancelSubfolderEdit = cancelSubfolderEdit,
+        deselectAllSubfolders = deselectAllSubfolders, goUpOneFolder = goUpOneFolder
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -261,6 +258,7 @@ private fun FolderItem(
         ) {
             CustomIconButton(
                 imageVector = Icons.Default.Folder,
+                onClick = onClick,
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
@@ -464,6 +462,25 @@ private fun DeleteSubfolderDialog(
             }
         }
     )
+}
+
+@Composable
+fun FolderBackHandler(
+    uiState: FolderUiState,
+    cancelSubfolderEdit: () -> Unit,
+    deselectAllSubfolders: () -> Unit,
+    goUpOneFolder: () -> Unit
+) {
+    val onBack: () -> Unit = if (uiState.subfolderEdit != null) {
+        cancelSubfolderEdit
+    } else if (uiState.selectedSubfolders.isNotEmpty()) {
+        deselectAllSubfolders
+    } else if (uiState.path != null && uiState.path.canGoUpOneFolder) {
+        goUpOneFolder
+    } else {
+        return
+    }
+    BackHandler(enabled = true, onBack)
 }
 
 // Data for preview.
