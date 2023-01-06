@@ -35,7 +35,8 @@ import com.lr_soft.mywordcards.ui.theme.MyWordCardsTheme
 @Composable
 fun FolderRoute(
     viewModel: FolderViewModel = hiltViewModel(),
-    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    goToWords: (List<String>) -> Unit
 ) {
     FolderScreen(
         uiState = viewModel.uiState,
@@ -50,7 +51,14 @@ fun FolderRoute(
         cancelSubfolderEdit = viewModel::cancelSubfolderEdit,
         goToSubfolder = viewModel::goToSubfolder,
         goUpOneFolder = viewModel::goUpOneFolder,
-        goToWords = viewModel::goToWords,
+        goToWords = {
+            val selectedSubfolders = viewModel.uiState.selectedSubfolders
+            val folders = selectedSubfolders.ifEmpty {
+                val currentSubfolder = viewModel.uiState.path?.currentFolder ?: return@FolderScreen
+                listOf(currentSubfolder)
+            }
+            goToWords(folders.map(Folder::name))
+        },
         toggleSubfolderSelection = viewModel::toggleSubfolderSelection,
         deselectAllSubfolders = viewModel::deselectAllSubfolders,
         userMessageShown = viewModel::userMessageShown,

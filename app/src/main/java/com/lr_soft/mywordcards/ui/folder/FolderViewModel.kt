@@ -150,10 +150,6 @@ class FolderViewModel @Inject constructor(
         }
     }
 
-    fun goToWords() {
-        TODO()
-    }
-
     fun toggleSubfolderSelection(subfolder: Folder) {
         val path = uiState.path ?: return
         if (subfolder !in path.currentFolder.subfolders) {
